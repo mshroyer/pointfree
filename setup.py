@@ -7,7 +7,7 @@ setup(name='fpkit',
       description='Functional programming toolkit for Python',
       author='Mark Shroyer',
       author_email='code@markshroyer.com',
-      url='https://github.com/markshroyer/fpkit',
+      url='https://github.com/markshroyer/python-fpkit',
       py_modules=['fpkit'],
       package_dir = {'': 'src'}
       )

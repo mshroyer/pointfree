@@ -30,7 +30,7 @@ This syntax also works with generators, so that you can set up generator
 pipelines with the >> operator.  See examples.py, distributed with this
 module, for more examples.
 
-https://github.com/markshroyer/fpkit
+https://github.com/markshroyer/python-fpkit
 
 """
 
