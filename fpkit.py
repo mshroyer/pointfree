@@ -1,7 +1,36 @@
 """
-fpkit
+Functional programming toolkit for Python
 
-Functional programming toolkit for Python.
+Implements easy function composition and currying via operator overloads
+and some trickery using decorators.  This makes it possible to do things
+like:
+
+    @curryable
+    def add(a, b):
+        return a + b
+
+    @curryable
+    def mult(a, b):
+        return a * b
+
+    # Function currying
+    x = add(3)(5)
+    f = mult(3)
+    y = f(5)
+    print (x, y) # prints (8, 15)
+
+    # Currying and forward composition with the >> operator
+    g = add(1) >> mult(9) >> add(6)
+
+    # Regular function composition with the * operator
+    h = printfn * g
+    h(3) # prints 4
+
+This syntax also works with generators, so that you can set up generator
+pipelines with the >> operator.  See examples.py, distributed with this
+module, for more examples.
+
+https://github.com/markshroyer/fpkit
 
 """
 
@@ -31,7 +60,7 @@ class Comp:
     def __call__(self, *a):
         return self.f(*a)
 
-def compval(val):
+def compv(val):
     """Turn a non-callable value into a composable function
 
     Makes a composable function that returns the given value when called.
@@ -59,3 +88,15 @@ def curr(f):
 # Verbose form for function decorators
 composable = Comp
 curryable = curr
+
+@composable
+def ignore(iterator):
+    for x in iterator: pass
+
+@composable
+def printf(output):
+    print output,
+
+@composable
+def printfn(output):
+    print output
