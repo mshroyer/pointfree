@@ -1,5 +1,5 @@
 """
-Functional programming toolkit for Python
+Point-free style support for Python
 
 Implements easy function composition and currying via operator overloads
 and some trickery using decorators.  This makes it possible to do things
@@ -30,7 +30,7 @@ This syntax also works with generators, so that you can set up generator
 pipelines with the >> operator.  See examples.py, distributed with this
 module, for more examples.
 
-https://github.com/markshroyer/python-fpkit
+https://github.com/markshroyer/python-pointfree
 
 """
 

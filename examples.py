@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from fpkit import curryable, composable, printfn
+from pointfree import curryable, composable, printfn
 
 def example_a():
     @curryable
