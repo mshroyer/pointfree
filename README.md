@@ -31,18 +31,18 @@ FAQ
     to explicitly be partially applied, which is more verbose than I like,
     e.g.:
 
-	def add(a, b):
-	    return a + b
+        def add(a, b):
+            return a + b
 
-	plusone = functools.partial(add, 1)
+        plusone = functools.partial(add, 1)
 
     whereas with the pointfree module you can instead do:
 
-    	@curryable
-	def add(a, b):
-	    return a + b
+        @curryable
+        def add(a, b):
+            return a + b
 
-    	plusone = add(1)
+        plusone = add(1)
 
     Part of the advantage of writing in the pointfree style is that it can
     be a very clean and elegant way of expressing certain types of
