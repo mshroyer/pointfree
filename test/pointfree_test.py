@@ -16,6 +16,3 @@ class CurryingTest(unittest.TestCase):
 
         self.assertEqual(add1(3), 4)
         self.assertEqual(mult2(4), 8)
-
-if __name__ == '__main__': 
-   unittest.main()
