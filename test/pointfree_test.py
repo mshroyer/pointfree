@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, sys, unittest, types
 from pointfree import *
 
@@ -9,7 +11,15 @@ def add(a, b):
 def mul(a, b):
     return a * b
 
-class CurryingTest(unittest.TestCase):
+class CurryableClass:
+    def __init__(self, n):
+        self.n = n
+
+    @curryable
+    def added_with(self, a, b):
+        return self.n + a + b
+
+class CurryingFunctionsTest(unittest.TestCase):
     """Function currying tests"""
 
     def testCurryingSimple(self):
@@ -58,3 +68,13 @@ class CurryingTest(unittest.TestCase):
         g = mul()()()
         self.assertEqual(g(3, 4), 12)
         
+class CurryingInstanceMethodsTest(unittest.TestCase):
+    """Instance method currying tests"""
+
+    def testCurryingInstanceMethods(self):
+        obj = CurryableClass(1)
+        f = obj.added_with(2)
+        self.assertEqual(f(3), 6)
+        
+if __name__ == '__main__':
+    unittest.main()

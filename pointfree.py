@@ -38,7 +38,7 @@ __author__  = "Mark Shroyer"
 __email__   = "code@markshroyer.com"
 __version__ = 0.1
 
-import inspect
+import inspect, types
 
 class Comp:
     """@composable function decorator
@@ -78,12 +78,14 @@ def curr(f):
 
     """
 
+    argc = len(inspect.getargspec(f)[0])
+
     def thunk(f, n, acum):
-        if n <= 0:
-            return f(*acum)
-        else:
+        if n > 0:
             return Comp(lambda *a: thunk(f, n-len(a), acum+list(a)))
-    return Comp(thunk(f, len(inspect.getargspec(f)[0]), []))
+        else:
+            return apply(f, acum)
+    return Comp(thunk(f, argc, []))
 
 # Verbose form for function decorators
 composable = Comp
