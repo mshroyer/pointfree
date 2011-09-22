@@ -3,78 +3,96 @@
 import os, sys, unittest, types
 from pointfree import *
 
-@curryable
-def add(a, b):
-    return a + b
+@composable
+def fun_add(a):
+    return 5 + a
 
-@curryable
-def mul(a, b):
-    return a * b
+@composable
+def fun_mul(a):
+    return 5 * a
 
-class CurryableClass:
+class ComposableThing(object):
+    """Class test fixture for @composable decorator"""
+
+    m = 3
+
     def __init__(self, n):
         self.n = n
 
-    @curryable
-    def added_with(self, a, b):
-        return self.n + a + b
+    @composable
+    def instance_add(self, a):
+        return self.n + a
 
-class CurryingFunctionsTest(unittest.TestCase):
-    """Function currying tests"""
+    @composable
+    def instance_mul(self, a):
+        return self.n * a
 
-    def testCurryingSimple(self):
-        """Check that basic partial application works"""
+    @composable
+    @classmethod
+    def class_add(klass, a):
+        return klass.m + a
 
-        add1  = add(1)
-        self.assertEqual(add1(3), 4)
+    @composable
+    @classmethod
+    def class_mul(klass, a):
+        return klass.m * a
 
-        mul2 = mul(2)
-        self.assertEqual(mul2(4), 8)
+    @composable
+    @staticmethod
+    def static_add(a):
+        return 4 + a
 
-    def testCurryingSingleApplication(self):
-        """Check single application of a curried function
-
-        We must still be able to apply a curried function to all its
-        arguments simultaneously.
-
-        """
-
-        self.assertEqual(add(1, 2), 3)
-        self.assertEqual(mul(2, 3), 6)
-
-    def testCurryingTooManyArgs(self):
-        """Error handling: too many arguments
-
-        An exception should be thrown if the curried function is applied to
-        an argument list longer than it can accept.
-
-        """
-
-        with self.assertRaises(TypeError):
-            add(1, 2, 3)
-
-    def testCurryingNoArgs(self):
-        """Edge case: zero arguments applied
-
-        The curryable function should return a functionally (though not
-        necessarily referentially identical) function if it is applied to
-        an empty argument list one or more times.
-
-        """
-
-        f = add()
-        self.assertEqual(f(1, 2), 3)
-
-        g = mul()()()
-        self.assertEqual(g(3, 4), 12)
+    @composable
+    @staticmethod
+    def static_mul(a):
+        return 4 * a
         
-class CurryingInstanceMethodsTest(unittest.TestCase):
-    """Instance method currying tests"""
+class ComposableFunctionCase(unittest.TestCase):
+    """Function test cases for @composable"""
 
-    def testCurryingInstanceMethods(self):
-        obj = CurryableClass(1)
-        f = obj.added_with(2)
-        self.assertEqual(f(3), 6)
-        
+    def testFunctions(self):
+        f = fun_add * fun_mul
+        self.assertEqual(f(2), 15)
+
+class ComposableInstanceCase(unittest.TestCase):
+    """Instance test cases for @composable
+
+    Tests that the @composable decorator works correctly when applied to
+    methods which are subsequently accessed through an instance of their
+    class.
+
+    """
+
+    def setUp(self):
+        self.t = ComposableThing(2)
+
+    def testInstanceMethods(self):
+        f = self.t.instance_add * self.t.instance_mul
+        self.assertEqual(f(2), 6)
+
+    def testClassMethods(self):
+        f = self.t.class_add * self.t.class_mul
+        self.assertEqual(f(2), 9)
+
+    def testStaticMethods(self):
+        f = self.t.static_add * self.t.static_mul
+        self.assertEqual(f(2), 12)
+
+class ComposableClassCase(unittest.TestCase):
+    """Class test cases for @composable
+
+    Tests that the @composable decorator works correctly when applied to
+    methods which are subsequently accessed directly through their class.
+
+    """
+    
+    def testClassMethods(self):
+        f = ComposableThing.class_add * ComposableThing.class_mul
+        self.assertEqual(f(2), 9)
+
+    def testStaticMethods(self):
+        f = ComposableThing.static_add * ComposableThing.static_mul
+        self.assertEqual(f(2), 12)
+
 if __name__ == '__main__':
     unittest.main()

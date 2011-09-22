@@ -40,7 +40,7 @@ __version__ = 0.1
 
 import inspect, types
 
-class Comp:
+class Comp(object):
     """@composable function decorator
 
     Converts a regular Python function into one which can be composed with
@@ -56,6 +56,12 @@ class Comp:
 
     def __rshift__(self, g):
         return self.__class__(lambda *a: g(self.f(*a)))
+
+    def __get__(self, inst, owner=None):
+        if hasattr(self.f, '__call__'):
+            return self.__class__(types.MethodType(self.f, inst))
+        else:
+            return self.__class__(self.f.__get__(None, owner))
 
     def __call__(self, *a):
         return self.f(*a)
