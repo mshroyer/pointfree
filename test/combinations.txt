@@ -7,11 +7,11 @@ Tested combinations of method decorators.
 | Instance     | @composable   | -                | Y      |
 | Instance     | @composable   | @classmethod     | Y      |
 | Instance     | @composable   | @staticmethod    | Y      |
-| Instance     | @currying     | -                |        |
-| Instance     | @currying     | @classmethod     |        |
-| Instance     | @currying     | @staticmethod    |        |
-| Class        | @composable   | @classmethod     |        |
-| Class        | @composable   | @staticmethod    |        |
+| Instance     | @currying     | -                | Y      |
+| Instance     | @currying     | @classmethod     | Y      |
+| Instance     | @currying     | @staticmethod    | Y      |
+| Class        | @composable   | @classmethod     | Y      |
+| Class        | @composable   | @staticmethod    | Y      |
 | Class        | @currying     | @classmethod     |        |
 | Class        | @currying     | @staticmethod    |        |
 

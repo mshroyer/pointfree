@@ -52,16 +52,25 @@ class composable(object):
         self.f = f
 
     def __mul__(self, g):
-        return self.__class__(lambda *a: self.f(g(*a)))
+        return self.__class__(lambda *a: self(g(*a)))
 
     def __rshift__(self, g):
-        return self.__class__(lambda *a: g(self.f(*a)))
+        return self.__class__(lambda *a: g(self(*a)))
 
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
-            return self.__class__(types.MethodType(self.f, inst))
+            # Instance method
+            argc = len(inspect.getargspec(self.f)[0]) - 1
+            instance = self.__class__(types.MethodType(self.f, inst))
+            instance.argc = argc
+            return instance
         else:
-            return self.__class__(self.f.__get__(None, owner))
+            # Class or static method
+            diff = 1 if isinstance(self.f, classmethod) else 0
+            argc = len(inspect.getargspec(self.f.__func__)[0]) - diff
+            instance = self.__class__(self.f.__get__(None, owner))
+            instance.argc = argc
+            return instance
 
     def __call__(self, *a):
         return self.f(*a)
@@ -84,14 +93,17 @@ class currying(composable):
 
     """
 
-    def __init__(self, f):
-        argc = inspect.getargspec(f)[0]
-        def thunk(f, n, acum):
-            if n > 0:
-                return composable(lambda *a: thunk(f, n-len(a), acum+list(a)))
-            else:
-                return apply(f, acum)
-        self.f = thunk(f, argc, [])
+    def __call__(self, *a):
+        argc = self.argc if hasattr(self, 'argc') else len(inspect.getargspec(self.f)[0])
+        acum = self.acum if hasattr(self, 'acum') else []
+        #import pdb; pdb.set_trace()
+        if len(a) < argc:
+            thunk = self.__class__(self.f)
+            thunk.argc = argc - len(a)
+            thunk.acum = acum + list(a)
+            return thunk
+        else:
+            return apply(self.f, acum + list(a))
 
 @composable
 def ignore(iterator):
