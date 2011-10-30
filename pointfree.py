@@ -40,26 +40,29 @@ __version__ = 0.1
 
 import inspect, types
 
-class composable(object):
-    """@composable function decorator
+class partial(object):
+    """@partial function decorator
 
-    Converts a regular Python function into one which can be composed with
-    other Python functions using the * and >> operators.
+    Converts a regular Python function into one supporting a form of
+    partial application.  Supports positional arguments only.
 
     """
 
     def __init__(self, f):
         self.f = f
+
+        if isinstance(f, types.MethodType) or isinstance(f, classmethod):
+            self.argc = len(inspect.getargspec(f.__func__)[0]) - 1
+        elif isinstance(f, staticmethod):
+            self.argc = len(inspect.getargspec(f.__func__)[0])
+        else:
+            self.argc = len(inspect.getargspec(f)[0])
+        self.acum = []
+
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
         if hasattr(f, '__name__'):
             self.__name__ = f.__name__
-
-    def __mul__(self, g):
-        return self.__class__(lambda *a: self(g(*a)))
-
-    def __rshift__(self, g):
-        return self.__class__(lambda *a: g(self(*a)))
 
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
@@ -70,28 +73,6 @@ class composable(object):
             return self.__class__(self.f.__get__(None, owner))
 
     def __call__(self, *a):
-        return self.f(*a)
-
-class currying(composable):
-    """@currying function decorator
-
-    Converts a regular Python function into one supporting a form of
-    partial application.  Supports positional arguments only.  Functions
-    with this decorator are automatically composable.
-
-    """
-
-    def __init__(self, f):
-        if isinstance(f, types.MethodType) or isinstance(f, classmethod):
-            self.argc = len(inspect.getargspec(f.__func__)[0]) - 1
-        elif isinstance(f, staticmethod):
-            self.argc = len(inspect.getargspec(f.__func__)[0])
-        else:
-            self.argc = len(inspect.getargspec(f)[0])
-        self.acum = []
-        super(currying, self).__init__(f)
-
-    def __call__(self, *a):
         if len(a) < self.argc:
             thunk = self.__class__(self.f)
             thunk.argc = self.argc - len(a)
@@ -100,14 +81,29 @@ class currying(composable):
         else:
             return apply(self.f, self.acum + list(a))
 
-@composable
+class pointfree(partial):
+    """@pointfree function decorator
+
+    Converts a regular Python function into one which can be composed with
+    other Python functions using the * and >> operators.  Functions with
+    this decorator also automatically support partial application.
+
+    """
+
+    def __mul__(self, g):
+        return self.__class__(lambda *a: self(g(*a)))
+
+    def __rshift__(self, g):
+        return self.__class__(lambda *a: g(self(*a)))
+
+@pointfree
 def ignore(iterator):
     for x in iterator: pass
 
-@composable
+@pointfree
 def printf(output):
     print output,
 
-@composable
+@pointfree
 def printfn(output):
     print output
