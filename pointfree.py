@@ -50,6 +50,10 @@ class composable(object):
 
     def __init__(self, f):
         self.f = f
+        if hasattr(f, '__doc__'):
+            self.__doc__ = f.__doc__
+        if hasattr(f, '__name__'):
+            self.__name__ = f.__name__
 
     def __mul__(self, g):
         return self.__class__(lambda *a: self(g(*a)))
