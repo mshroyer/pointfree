@@ -91,10 +91,14 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        return self.__class__(lambda *a: self(g(*a)))
+        instance = self.__class__(lambda *a: self(g(*a)))
+        instance.argc = g.argc
+        return instance
 
     def __rshift__(self, g):
-        return self.__class__(lambda *a: g(self(*a)))
+        instance = self.__class__(lambda *a: g(self(*a)))
+        instance.argc = self.argc
+        return instance
 
 @pointfree
 def ignore(iterator):
