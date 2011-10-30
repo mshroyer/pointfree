@@ -92,7 +92,8 @@ class pointfree(partial):
 
     def __mul__(self, g):
         instance = self.__class__(lambda *a: self(g(*a)))
-        instance.argc = g.argc
+        if hasattr(g, 'argc'):
+            instance.argc = g.argc
         return instance
 
     def __rshift__(self, g):
