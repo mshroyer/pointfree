@@ -1,0 +1,25 @@
+-*- mode: orgtbl; -*-
+
+Tested combinations of method decorators.
+
+| Invoked from | Top decorator | Bottom decorator | Result |
+|--------------+---------------+------------------+--------|
+| Instance     | @composable   | -                | Y      |
+| Instance     | @composable   | @classmethod     | Y      |
+| Instance     | @composable   | @staticmethod    | Y      |
+| Instance     | @currying     | -                |        |
+| Instance     | @currying     | @classmethod     |        |
+| Instance     | @currying     | @staticmethod    |        |
+| Class        | @composable   | @classmethod     |        |
+| Class        | @composable   | @staticmethod    |        |
+| Class        | @currying     | @classmethod     |        |
+| Class        | @currying     | @staticmethod    |        |
+
+TODO:
+
+Clean up composable object instantiation.  Reduce the number of objects
+created between __init__ and __get__ if possible.
+
+Full unit test suite for currying behavior.
+
+Preserve wrapped function metadata in composable and currying decorators.
