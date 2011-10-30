@@ -64,17 +64,10 @@ class composable(object):
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
             # Instance method
-            argc = len(inspect.getargspec(self.f)[0]) - 1
-            instance = self.__class__(types.MethodType(self.f, inst))
-            instance.argc = argc
-            return instance
+            return self.__class__(types.MethodType(self.f, inst))
         else:
             # Class or static method
-            diff = 1 if isinstance(self.f, classmethod) else 0
-            argc = len(inspect.getargspec(self.f.__func__)[0]) - diff
-            instance = self.__class__(self.f.__get__(None, owner))
-            instance.argc = argc
-            return instance
+            return self.__class__(self.f.__get__(None, owner))
 
     def __call__(self, *a):
         return self.f(*a)
@@ -89,7 +82,7 @@ def compv(val):
     return Comp(lambda *a: val)
 
 class currying(composable):
-    """@curryable function decorator
+    """@currying function decorator
 
     Converts a regular Python function into one supporting a form of
     partial application.  Supports positional arguments only.  Functions
@@ -97,10 +90,20 @@ class currying(composable):
 
     """
 
+    def __get__(self, inst, owner=None):
+        if hasattr(self.f, '__call__'):
+            instance = self.__class__(types.MethodType(self.f, inst))
+            instance.argc = len(inspect.getargspec(self.f)[0]) - 1
+            return instance
+        else:
+            diff = 1 if isinstance(self.f, classmethod) else 0
+            instance = self.__class__(self.f.__get__(None, owner))
+            instance.argc = len(inspect.getargspec(self.f.__func__)[0]) - diff
+            return instance
+
     def __call__(self, *a):
         argc = self.argc if hasattr(self, 'argc') else len(inspect.getargspec(self.f)[0])
         acum = self.acum if hasattr(self, 'acum') else []
-        #import pdb; pdb.set_trace()
         if len(a) < argc:
             thunk = self.__class__(self.f)
             thunk.argc = argc - len(a)
