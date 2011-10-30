@@ -75,7 +75,7 @@ def compv(val):
 
     return Comp(lambda *a: val)
 
-def currying(f):
+class currying(composable):
     """@curryable function decorator
 
     Converts a regular Python function into one supporting a form of
@@ -84,14 +84,14 @@ def currying(f):
 
     """
 
-    argc = len(inspect.getargspec(f)[0])
-
-    def thunk(f, n, acum):
-        if n > 0:
-            return composable(lambda *a: thunk(f, n-len(a), acum+list(a)))
-        else:
-            return apply(f, acum)
-    return composable(thunk(f, argc, []))
+    def __init__(self, f):
+        argc = inspect.getargspec(f)[0]
+        def thunk(f, n, acum):
+            if n > 0:
+                return composable(lambda *a: thunk(f, n-len(a), acum+list(a)))
+            else:
+                return apply(f, acum)
+        self.f = thunk(f, argc, [])
 
 @composable
 def ignore(iterator):

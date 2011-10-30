@@ -142,26 +142,26 @@ class CurryingThing(object):
     # def static_mul(a, b, c):
     #     return a * b * c
         
-class CurryingFunctionCase(unittest.TestCase):
-    def testFunctions(self):
-        f = currying_add(1, 2) * currying_mul(3, 4)
-        self.assertEqual(f(2), 27)
+# class CurryingFunctionCase(unittest.TestCase):
+#     def testFunctions(self):
+#         f = currying_add(1, 2) * currying_mul(3, 4)
+#         self.assertEqual(f(2), 27)
 
-class CurryingInstanceCase(unittest.TestCase):
-    def setUp(self):
-        self.t = CurryingThing(2)
+# class CurryingInstanceCase(unittest.TestCase):
+#     def setUp(self):
+#         self.t = CurryingThing(2)
 
-    def testInstanceMethods(self):
-        f = self.t.instance_add(1, 2) * self.t.instance_mul(3, 4)
-        self.assertEqual(f(2), 53)
+#     def testInstanceMethods(self):
+#         f = self.t.instance_add(1, 2) * self.t.instance_mul(3, 4)
+#         self.assertEqual(f(2), 53)
 
-    # def testClassMethods(self):
-    #     f = self.t.class_add(1, 2) * self.t.class_mul(3, 4)
-    #     self.assertEqual(f(2), 78)
+#     def testClassMethods(self):
+#         f = self.t.class_add(1, 2) * self.t.class_mul(3, 4)
+#         self.assertEqual(f(2), 78)
 
-    # def testStaticMethods(self):
-    #     f = self.t.static_add(1, 2) * self.t.static_mul(3, 4)
-    #     self.assertEqual(f(2), 27)
+#     def testStaticMethods(self):
+#         f = self.t.static_add(1, 2) * self.t.static_mul(3, 4)
+#         self.assertEqual(f(2), 27)
 
 if __name__ == '__main__':
     unittest.main()
