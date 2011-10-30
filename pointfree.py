@@ -72,15 +72,6 @@ class composable(object):
     def __call__(self, *a):
         return self.f(*a)
 
-def compv(val):
-    """Turn a non-callable value into a composable function
-
-    Makes a composable function that returns the given value when called.
-
-    """
-
-    return Comp(lambda *a: val)
-
 class currying(composable):
     """@currying function decorator
 
