@@ -12,8 +12,8 @@ Tested combinations of method decorators.
 | Instance     | @currying     | @staticmethod    | Y      |
 | Class        | @composable   | @classmethod     | Y      |
 | Class        | @composable   | @staticmethod    | Y      |
-| Class        | @currying     | @classmethod     |        |
-| Class        | @currying     | @staticmethod    |        |
+| Class        | @currying     | @classmethod     | Y      |
+| Class        | @currying     | @staticmethod    | Y      |
 
 TODO:
 

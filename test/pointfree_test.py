@@ -168,5 +168,14 @@ class CurryingInstanceCase(unittest.TestCase):
         f = self.t.static_add(1, 2) * self.t.static_mul(3, 4)
         self.assertEqual(f(2), 27)
 
+class CurryingClassCase(unittest.TestCase):
+    def testClassMethods(self):
+        f = CurryingThing.class_add(1, 2) * CurryingThing.class_mul(3, 4)
+        self.assertEqual(f(2), 78)
+
+    def testStaticMethods(self):
+        f = CurryingThing.static_add(1, 2) * CurryingThing.static_mul(3, 4)
+        self.assertEqual(f(2), 27)
+
 if __name__ == '__main__':
     unittest.main()
