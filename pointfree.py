@@ -90,27 +90,24 @@ class currying(composable):
 
     """
 
-    def __get__(self, inst, owner=None):
-        if hasattr(self.f, '__call__'):
-            instance = self.__class__(types.MethodType(self.f, inst))
-            instance.argc = len(inspect.getargspec(self.f)[0]) - 1
-            return instance
+    def __init__(self, f):
+        if isinstance(f, types.MethodType) or isinstance(f, classmethod):
+            self.argc = len(inspect.getargspec(f.__func__)[0]) - 1
+        elif isinstance(f, staticmethod):
+            self.argc = len(inspect.getargspec(f.__func__)[0])
         else:
-            diff = 1 if isinstance(self.f, classmethod) else 0
-            instance = self.__class__(self.f.__get__(None, owner))
-            instance.argc = len(inspect.getargspec(self.f.__func__)[0]) - diff
-            return instance
+            self.argc = len(inspect.getargspec(f)[0])
+        self.acum = []
+        super(currying, self).__init__(f)
 
     def __call__(self, *a):
-        argc = self.argc if hasattr(self, 'argc') else len(inspect.getargspec(self.f)[0])
-        acum = self.acum if hasattr(self, 'acum') else []
-        if len(a) < argc:
+        if len(a) < self.argc:
             thunk = self.__class__(self.f)
-            thunk.argc = argc - len(a)
-            thunk.acum = acum + list(a)
+            thunk.argc = self.argc - len(a)
+            thunk.acum = self.acum + list(a)
             return thunk
         else:
-            return apply(self.f, acum + list(a))
+            return apply(self.f, self.acum + list(a))
 
 @composable
 def ignore(iterator):
