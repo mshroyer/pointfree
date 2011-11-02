@@ -2,21 +2,22 @@ Introduction
 ============
 
 pointfree is a small Python module that makes certain functional
-programming constructs easier to use in the Python language.  Specifically,
-it provides:
+programming constructs easier to use in the Python language.
+
+Specifically, it provides:
 
   * A decorator to enable automatic partial application of functions and
-    methods
-  * Notations for function composition through operator overloading
-  * Helper functions to make composing generators more convenient
+    methods.
+  * Notations for function composition through operator overloading.
+  * Helper functions to make composing generators more convenient.
 
 The objective is to support the
 [pointfree programming style](http://www.haskell.org/haskellwiki/Pointfree)
 in a lightweight and easy to use manner.
 
 
-Quick Examples
-==============
+Examples
+========
 
 *TODO*
 
@@ -46,11 +47,11 @@ and static methods), as long as you're using new-style objects.
 
     class Foo(object):
         def __init__(self, n):
-	    self.n = n
+            self.n = n
 	    
 	@partial
 	def add(self, a, b):
-	    return self.n + a + b
+            return self.n + a + b
 
     >>> f = Foo(1)
     >>> f.add(2)(3)
@@ -90,7 +91,7 @@ FAQ
             return a + b
 
         plusone = functools.partial(add, 1)
-	plustwo = functools.partial(add, 2)
+        plustwo = functools.partial(add, 2)
 
     whereas with the pointfree module you can instead do:
 
@@ -99,7 +100,7 @@ FAQ
             return a + b
 
         plusone = add(1)
-	plustwo = add(2)
+        plustwo = add(2)
 
     Part of the advantage of writing in the pointfree style is that it can
     be a very clean and elegant way of expressing certain types of
@@ -110,6 +111,6 @@ FAQ
 Author
 ======
 
-Mark Shroyer <code@markshroyer.com>
+By [Mark Shroyer](http://markshroyer.com/) <code@markshroyer.com>
 
 Find the latest version at: http://github.com/markshroyer/python-pointfree
