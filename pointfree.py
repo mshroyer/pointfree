@@ -55,35 +55,23 @@ class partial(object):
         if isinstance(f, types.MethodType) \
                 or isinstance(f, classmethod) \
                 or isinstance(f, staticmethod):
-            actual_func = f.__func__
+            argspec = inspect.getargspec(f.__func__)
         else:
-            actual_func = f
+            argspec = inspect.getargspec(f)
 
         if isinstance(f, types.MethodType):
-            self.argspec = (inspect.getargspec(actual_func)[0])[1:]
+            self.args = (argspec[0])[1:]
         else:
-            self.argspec = (inspect.getargspec(actual_func)[0])[:]
+            self.args = (argspec[0])[:]
 
-        self.defaults = inspect.getargspec(actual_func)[3]
-        if self.defaults is None: self.defaults = ()
+        self.var_args  = argspec[1] is not None
+        self.var_kargs = argspec[2] is not None
+        self.defaults  = argspec[3] if argspec[3] is not None else ()
 
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
         if hasattr(f, '__name__'):
             self.__name__ = f.__name__
-
-    def is_fully_applied(self):
-        numd = len(self.defaults) if self.defaults else 0
-        mandargs = self.argspec if numd == 0 else self.argspec[:-numd]
-        for arg in mandargs:
-            if not self.argvals.has_key(arg):
-                return False
-        return True
-
-    def next_unapplied_arg(self):
-        for arg in self.argspec:
-            if not self.argvals.has_key(arg):
-                return arg
 
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
@@ -93,22 +81,39 @@ class partial(object):
             # Bind class or static method
             return self.__class__(self.f.__get__(None, owner), argvals=self.argvals)
 
-    def __call__(self, *av, **kav):
-        if self.is_fully_applied():
-            return self.f(**self.argvals)
-
+    def __call__(self, *apply_av, **apply_kav):
         new_argvals = self.argvals.copy()
-        if len(av) > 0:
-            new_argvals[self.next_unapplied_arg()] = av[0]
-            return self.__class__(self.f, argvals=new_argvals)(*(av[1:]), **kav)
-        elif len(kav) > 0:
-            first_key = kav.keys()[0]
-            new_argvals[first_key] = kav[first_key]
-            new_kav = kav.copy()
-            del new_kav[first_key]
-            return self.__class__(self.f, argvals=new_argvals)(*av, **new_kav)
+        extra_argvals = []
+
+        for v in apply_av:
+            arg_i = None
+            for name in self.args:
+                if not new_argvals.has_key(name):
+                    arg_i = name
+                    break
+
+            if arg_i:
+                new_argvals[arg_i] = v
+            else:
+                extra_argvals.append(v)
+
+        for k,v in apply_kav.iteritems():
+            new_argvals[k] = v
+
+        numd = len(self.defaults) if self.defaults else 0
+        mandargs = self.args if numd == 0 else self.args[:-numd]
+        fully_applied = True
+        for name in mandargs:
+            if not new_argvals.has_key(name):
+                fully_applied = False
+                break
+
+        if fully_applied:
+            fargs  = [new_argvals[n] for n in self.args if new_argvals.has_key(n)]
+            fkargs = dict((key,val) for key,val in new_argvals.iteritems() if not (key in self.args))
+            return self.f(*fargs, **fkargs)
         else:
-            return self
+            return self.__class__(self.f, argvals=new_argvals)
 
 class pointfree(partial):
     """@pointfree function decorator
@@ -122,12 +127,12 @@ class pointfree(partial):
     def __mul__(self, g):
         instance = self.__class__(lambda *a: self(g(*a)))
         if hasattr(g, 'argc'):
-            instance.argc = g.argc
+            instance.args = g.args
         return instance
 
     def __rshift__(self, g):
         instance = self.__class__(lambda *a: g(self(*a)))
-        instance.argc = self.argc
+        instance.args = self.args
         return instance
 
 @pointfree
