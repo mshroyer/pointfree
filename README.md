@@ -49,8 +49,8 @@ and static methods), as long as you're using new-style objects.
         def __init__(self, n):
             self.n = n
 	    
-	@partial
-	def add(self, a, b):
+        @partial
+        def add(self, a, b):
             return self.n + a + b
 
     >>> f = Foo(1)
@@ -111,6 +111,6 @@ FAQ
 Author
 ======
 
-By [Mark Shroyer](http://markshroyer.com/) <code@markshroyer.com>
+By [Mark Shroyer](http://markshroyer.com/) &lt;code@markshroyer.com&gt;
 
 Find the latest version at: http://github.com/markshroyer/python-pointfree
