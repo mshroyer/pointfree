@@ -48,38 +48,67 @@ class partial(object):
 
     """
 
-    def __init__(self, f):
+    def __init__(self, f, argvals={}):
         self.f = f
+        self.argvals = argvals
 
-        if isinstance(f, types.MethodType) or isinstance(f, classmethod):
-            self.argc = len(inspect.getargspec(f.__func__)[0]) - 1
-        elif isinstance(f, staticmethod):
-            self.argc = len(inspect.getargspec(f.__func__)[0])
+        if isinstance(f, types.MethodType) \
+                or isinstance(f, classmethod) \
+                or isinstance(f, staticmethod):
+            actual_func = f.__func__
         else:
-            self.argc = len(inspect.getargspec(f)[0])
-        self.acum = []
+            actual_func = f
+
+        if isinstance(f, types.MethodType):
+            self.argspec = (inspect.getargspec(actual_func)[0])[1:]
+        else:
+            self.argspec = (inspect.getargspec(actual_func)[0])[:]
+
+        self.defaults = inspect.getargspec(actual_func)[3]
+        if self.defaults is None: self.defaults = ()
 
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
         if hasattr(f, '__name__'):
             self.__name__ = f.__name__
 
+    def is_fully_applied(self):
+        numd = len(self.defaults) if self.defaults else 0
+        mandargs = self.argspec if numd == 0 else self.argspec[:-numd]
+        for arg in mandargs:
+            if not self.argvals.has_key(arg):
+                return False
+        return True
+
+    def next_unapplied_arg(self):
+        for arg in self.argspec:
+            if not self.argvals.has_key(arg):
+                return arg
+
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
-            # Instance method
-            return self.__class__(types.MethodType(self.f, inst))
+            # Bind instance method
+            return self.__class__(types.MethodType(self.f, inst), argvals=self.argvals)
         else:
-            # Class or static method
-            return self.__class__(self.f.__get__(None, owner))
+            # Bind class or static method
+            return self.__class__(self.f.__get__(None, owner), argvals=self.argvals)
 
-    def __call__(self, *a):
-        if len(a) < self.argc:
-            thunk = self.__class__(self.f)
-            thunk.argc = self.argc - len(a)
-            thunk.acum = self.acum + list(a)
-            return thunk
+    def __call__(self, *av, **kav):
+        if self.is_fully_applied():
+            return self.f(**self.argvals)
+
+        new_argvals = self.argvals.copy()
+        if len(av) > 0:
+            new_argvals[self.next_unapplied_arg()] = av[0]
+            return self.__class__(self.f, argvals=new_argvals)(*(av[1:]), **kav)
+        elif len(kav) > 0:
+            first_key = kav.keys()[0]
+            new_argvals[first_key] = kav[first_key]
+            new_kav = kav.copy()
+            del new_kav[first_key]
+            return self.__class__(self.f, argvals=new_argvals)(*av, **new_kav)
         else:
-            return apply(self.f, self.acum + list(a))
+            return self
 
 class pointfree(partial):
     """@pointfree function decorator
