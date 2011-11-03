@@ -98,6 +98,8 @@ class partial(object):
                 extra_argvals.append(v)
 
         for k,v in apply_kav.iteritems():
+            if not (self.var_kargs or (k in self.args)):
+                raise TypeError("%s() got an unexpected keyword argument '%s'" % (self.__name__, k))
             new_argvals[k] = v
 
         numd = len(self.defaults) if self.defaults else 0
