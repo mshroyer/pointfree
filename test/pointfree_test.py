@@ -101,8 +101,12 @@ class PartialFuncErrorCase(unittest.TestCase):
     def testTooManyKargsEarlyError(self):
         self.assertRaises(TypeError, lambda: padd(d=4))
 
-    def testMultipleArgValsError(self):
-        self.assertRaises(TypeError, lambda: padd(1,2,3,a=4,b=5,c=6))
+    def testNoMultipleArgValsError(self):
+        # Even though this wouldn't be legal with a regular Python
+        # function, I think it's convenient to allow arguments to be
+        # multiply specified in partial functions.
+        self.assertEqual(padd(1,2,3,a=4,b=5,c=6), 32)
+        self.assertEqual(padd(1,2)(a=3)(4), 19)
 
 class PartialFuncVarArgsCase(unittest.TestCase):
     def testNormalApplication(self):
