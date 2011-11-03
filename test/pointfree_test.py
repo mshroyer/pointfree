@@ -32,17 +32,17 @@ class PartialThing(object):
         self.n = n
 
     @partial
-    def instance_adder(self, a, b, c):
+    def instance_padd(self, a, b, c):
         return self.n + a + 2*b + 3*c
 
     @partial
     @classmethod
-    def class_adder(klass, a, b, c):
+    def class_padd(klass, a, b, c):
         return klass.m + a + 2*b + 3*c
 
     @partial
     @staticmethod
-    def static_adder(a, b, c):
+    def static_padd(a, b, c):
         return a + 2*b + 3*c
 
 class PartialFuncCase(unittest.TestCase):
@@ -125,6 +125,40 @@ class PartialFuncVarArgsKargsCase(unittest.TestCase):
         val,kargs = padd_var_args_kargs(1,c=5)(d=6)(2,3,4)
         self.assertEqual(val, 26)
         self.assertDictEqual(kargs, {'c': 5, 'd': 6})
+
+class PartialMethodCase(unittest.TestCase):
+    def setUp(self):
+        self.inst = PartialThing(2)
+
+    def testNormalApplication(self):
+        self.assertEqual(self.inst.instance_padd(1,2,3), 16)
+
+    def testPartialApplication(self):
+        self.assertEqual(self.inst.instance_padd(1)(2)(3), 16)
+
+class PartialClassMethodCase(unittest.TestCase):
+    def setUp(self):
+        self.inst = PartialThing(2)
+
+    def testNormalApplication(self):
+        self.assertEqual(self.inst.class_padd(1,2,3), 15)
+        self.assertEqual(PartialThing.class_padd(1,2,3), 15)
+
+    def testPartialApplication(self):
+        self.assertEqual(self.inst.class_padd(1)(2)(3), 15)
+        self.assertEqual(PartialThing.class_padd(1)(2)(3), 15)
+
+class PartialStaticMethodCase(unittest.TestCase):
+    def setUp(self):
+        self.inst = PartialThing(2)
+
+    def testNormalApplication(self):
+        self.assertEqual(self.inst.static_padd(1,2,3), 14)
+        self.assertEqual(PartialThing.static_padd(1,2,3), 14)
+
+    def testPartialApplication(self):
+        self.assertEqual(self.inst.static_padd(1)(2)(3), 14)
+        self.assertEqual(PartialThing.static_padd(1)(2)(3), 14)
 
 if __name__ == '__main__':
     unittest.main()
