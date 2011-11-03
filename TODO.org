@@ -7,6 +7,10 @@
    Investigate how the @decorator decorator preserves original function
    metadata so that e.g. inspect.getargspec() still returns the original
    result.
+** TODO Review __get__ descriptor method
+   Is it really necessary to handle instance vs. class and static methods
+   separately?  Why did we decide on this approach in the first place?  Why
+   does __call__ work here?
 * Composition mechanism
 ** TODO Figure out argspecs for composite functions
    How should we handle argument specifications for composite, partially
