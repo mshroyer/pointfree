@@ -127,15 +127,10 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        instance = self.__class__(lambda *a: self(g(*a)))
-        if hasattr(g, 'argc'):
-            instance.args = g.args
-        return instance
+        return self.__class__(lambda *a: self(g(*a)))
 
     def __rshift__(self, g):
-        instance = self.__class__(lambda *a: g(self(*a)))
-        instance.args = self.args
-        return instance
+        return self.__class__(lambda *a: g(self(*a)))
 
 @pointfree
 def ignore(iterator):

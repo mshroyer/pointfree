@@ -3,7 +3,7 @@
 import os, sys, unittest, types
 from pointfree import partial, pointfree
 
-### PARTIAL APPLICATION TESTS #############################################
+### PARTIAL APPLICATION FIXTURES ##########################################
 
 @partial
 def padd(a, b, c):
@@ -54,6 +54,8 @@ class PartialThing(object):
     @partial
     def static_padd_in(a, b, c):
         return a + 2*b + 3*c
+
+### PARTIAL APPLICATION TESTS #############################################
 
 class PartialFuncCase(unittest.TestCase):
     def testNormalApplication(self):
@@ -109,12 +111,16 @@ class PartialFuncErrorCase(unittest.TestCase):
         self.assertRaises(TypeError, lambda: padd(1,2,3,d=4))
 
     def testTooManyKargsEarlyError(self):
+        """Make sure we raise an error as soon as we can possibly determine
+        we've passed an invalid keyword argument to the function."""
+
         self.assertRaises(TypeError, lambda: padd(d=4))
 
     def testNoMultipleArgValsError(self):
-        # Even though this wouldn't be legal with a regular Python
-        # function, I think it's convenient to allow arguments to be
-        # multiply specified in partial functions.
+        """Even though this wouldn't be legal with a regular Python
+        function, I think it's convenient to allow arguments to be multiply
+        specified in partial functions."""
+        
         self.assertEqual(padd(1,2,3,a=4,b=5,c=6), 32)
         self.assertEqual(padd(1,2)(a=3)(4), 19)
 
@@ -226,6 +232,41 @@ class PartialStaticMethodInnerCase(unittest.TestCase):
     def testPartialApplication(self):
         self.assertEqual(self.inst.static_padd_in(1)(2)(3), 14)
         self.assertEqual(PartialThing.static_padd_in(1)(2)(3), 14)
+
+### POINTFREE OPERATOR FIXTURES ###########################################
+
+@pointfree
+def cadd(a, b):
+    return a + b
+
+@pointfree
+def cmul(a, b):
+    return a * b
+
+### POINTFREE OPERATOR TESTS ##############################################
+
+class PointfreeFuncCase(unittest.TestCase):
+    def testNormalApplication(self):
+        self.assertEqual(cadd(2,3), 5)
+        self.assertEqual(cmul(2,3), 6)
+
+    def testPartialApplication(self):
+        self.assertIsInstance(cadd(2), pointfree)
+        self.assertEqual(cadd(2)(3), 5)
+
+    def testCompOperator(self):
+        f = cadd(3) * cmul(2)
+        self.assertEqual(f(5), 13)
+
+    def testCompOperatorMultiple(self):
+        f = cadd(3) * cmul(2) * cadd(1)
+        self.assertEqual(f(1), 7)
+
+    def testForwardOperator(self):
+        f = cmul(2) >> cadd(3)
+        self.assertEqual(f(5), 13)
+
+### END TESTS #############################################################
 
 if __name__ == '__main__':
     unittest.main()
