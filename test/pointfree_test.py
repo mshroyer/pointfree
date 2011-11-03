@@ -45,6 +45,16 @@ class PartialThing(object):
     def static_padd(a, b, c):
         return a + 2*b + 3*c
 
+    @classmethod
+    @partial
+    def class_padd_in(klass, a, b, c):
+        return klass.m + a + 2*b + 3*c
+
+    @staticmethod
+    @partial
+    def static_padd_in(a, b, c):
+        return a + 2*b + 3*c
+
 class PartialFuncCase(unittest.TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd(1,2,3), 14)
@@ -188,6 +198,34 @@ class PartialStaticMethodCase(unittest.TestCase):
     def testPartialApplication(self):
         self.assertEqual(self.inst.static_padd(1)(2)(3), 14)
         self.assertEqual(PartialThing.static_padd(1)(2)(3), 14)
+
+class PartialClassMethodInnerCase(unittest.TestCase):
+    def setUp(self):
+        self.inst = PartialThing(2)
+
+    def testClassMethodType(self):
+        self.assertIsInstance(self.inst.class_padd_in, types.MethodType)
+        self.assertIsInstance(PartialThing.class_padd_in, types.MethodType)
+
+    def testNormalApplication(self):
+        self.assertEqual(self.inst.class_padd_in(1,2,3), 15)
+        self.assertEqual(PartialThing.class_padd_in(1,2,3), 15)
+
+    def testPartialApplication(self):
+        self.assertEqual(self.inst.class_padd_in(1)(2)(3), 15)
+        self.assertEqual(PartialThing.class_padd_in(1)(2)(3), 15)
+
+class PartialStaticMethodInnerCase(unittest.TestCase):
+    def setUp(self):
+        self.inst = PartialThing(2)
+
+    def testNormalApplication(self):
+        self.assertEqual(self.inst.static_padd_in(1,2,3), 14)
+        self.assertEqual(PartialThing.static_padd_in(1,2,3), 14)
+
+    def testPartialApplication(self):
+        self.assertEqual(self.inst.static_padd_in(1)(2)(3), 14)
+        self.assertEqual(PartialThing.static_padd_in(1)(2)(3), 14)
 
 if __name__ == '__main__':
     unittest.main()
