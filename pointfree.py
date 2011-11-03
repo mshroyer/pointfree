@@ -109,7 +109,7 @@ class partial(object):
                 break
 
         if fully_applied:
-            fargs  = [new_argvals[n] for n in self.args if new_argvals.has_key(n)]
+            fargs  = [new_argvals[n] for n in self.args if new_argvals.has_key(n)] + extra_argvals
             fkargs = dict((key,val) for key,val in new_argvals.iteritems() if not (key in self.args))
             return self.f(*fargs, **fkargs)
         else:
