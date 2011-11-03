@@ -79,6 +79,15 @@ class PartialFuncDefaultsCase(unittest.TestCase):
     def testKeywordOverride(self):
         self.assertEqual(padd_defaults(c=4)(1,2), 17)
 
+class PartialFuncConcurrencyCase(unittest.TestCase):
+    def testReusedPartialApplication(self):
+        p = padd(1)
+        self.assertEqual(p(2,3), 14)
+
+        # Fully applying p the first time shouldn't change its state; we
+        # must be able to reuse it.
+        self.assertEqual(p(2)(3), 14)
+
 class PartialFuncVarArgsCase(unittest.TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_args(1,2), 5)
