@@ -88,6 +88,22 @@ class PartialFuncConcurrencyCase(unittest.TestCase):
         # must be able to reuse it.
         self.assertEqual(p(2)(3), 14)
 
+class PartialFuncErrorCase(unittest.TestCase):
+    def testTooManyArgsError(self):
+        self.assertRaises(TypeError, lambda: padd(1,2,3,4))
+
+    def testPartialTooManyArgsError(self):
+        self.assertRaises(TypeError, lambda: padd(1)(2)(3,4))
+
+    def testTooManyKargsError(self):
+        self.assertRaises(TypeError, lambda: padd(1,2,3,d=4))
+
+    def testTooManyKargsEarlyError(self):
+        self.assertRaises(TypeError, lambda: padd(d=4))
+
+    def testMultipleArgValsError(self):
+        self.assertRaises(TypeError, lambda: padd(1,2,3,a=4,b=5,c=6))
+
 class PartialFuncVarArgsCase(unittest.TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_args(1,2), 5)
