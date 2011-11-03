@@ -17,6 +17,10 @@ def padd_defaults(a, b, c=3):
 def padd_var_args(a, b, *args):
     return a + 2*b + 3*sum(args)
 
+@partial
+def padd_var_kargs(a, b, **kargs):
+    return (a + 2*b, kargs)
+
 class PartialThing(object):
     m = 1
 
@@ -57,6 +61,10 @@ class PartialFuncCase(unittest.TestCase):
     def testPartialKeywords(self):
         self.assertEqual(padd(c=3)(1,2), 14)
 
+    def testPartialKeywordsOutOfOrder(self):
+        self.assertEqual(padd(b=2)(1)(3), 14)
+        self.assertEqual(padd(b=2)(1,3), 14)
+
 class PartialFuncDefaultsCase(unittest.TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_defaults(1,2), 14)
@@ -71,8 +79,34 @@ class PartialFuncVarArgsCase(unittest.TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_args(1,2), 5)
 
+    def testPartialApplication(self):
+        self.assertEqual(padd_var_args(1)(2), 5)
+
     def testVarArgsApplication(self):
         self.assertEqual(padd_var_args(1,2,3,4), 26)
+
+    def testVarArgsPartialApplication(self):
+        self.assertEqual(padd_var_args(1)(2,3,4,5), 41)
+
+class PartialFuncVarKargsCase(unittest.TestCase):
+    def testNormalApplication(self):
+        self.assertEqual(padd_var_kargs(1,2)[0], 5)
+
+    def testNormalKeywordsApplication(self):
+        self.assertEqual(padd_var_kargs(a=1,b=2)[0], 5)
+
+    def testPartialApplication(self):
+        self.assertEqual(padd_var_kargs(1)(2)[0], 5)
+
+    def testVarKargsApplication(self):
+        val,kargs = padd_var_kargs(1,2,c=3)
+        self.assertEqual(val, 5)
+        self.assertDictEqual(kargs, {'c': 3})
+
+    def testVarKargsPartialApplication(self):
+        val,kargs = padd_var_kargs(a=1)(c=3,d=4)(2)
+        self.assertEqual(val, 5)
+        self.assertDictEqual(kargs, {'c': 3, 'd': 4})
 
 if __name__ == '__main__':
     unittest.main()
