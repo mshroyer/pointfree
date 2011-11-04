@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 __author__  = "Mark Shroyer"
 __email__   = "code@markshroyer.com"
 __version__ = 0.1
@@ -123,9 +125,5 @@ def ignore(iterator):
     for x in iterator: pass
 
 @pointfree
-def printf(output):
-    print output,
-
-@pointfree
 def printfn(output):
-    print output
+    print(output)
