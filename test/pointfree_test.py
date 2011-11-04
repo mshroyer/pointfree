@@ -294,6 +294,17 @@ class PointfreeFuncMultipleArgCase(unittest.TestCase):
     def testPartialApplication(self):
         self.assertEqual(self.f(3)(4), 13)
 
+class ChainedOperatorsCase(unittest.TestCase):
+    def testMultipleCompOperators(self):
+        f = cadd(2) * cmul(3) * cadd(4)
+        self.assertEqual(f(1), 17)
+
+    def testMultipleForwardOperators(self):
+        f = cadd(2) \
+            >> cmul(3) \
+            >> cadd(4)
+        self.assertEqual(f(1), 13)
+
 ### END TESTS #############################################################
 
 if __name__ == '__main__':
