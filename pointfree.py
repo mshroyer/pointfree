@@ -16,29 +16,36 @@ class partial(object):
         self.f = f
         self.argv = argv.copy()
 
-        if isinstance(f, types.MethodType) \
-                or isinstance(f, classmethod) \
-                or isinstance(f, staticmethod):
-            argspec = inspect.getargspec(f.__func__)
+        if copy_sig is not None:
+            self.pargl     = list(copy_sig.pargl)
+            self.kargl     = copy_sig.kargl.copy()
+            self.def_argv  = copy_sig.def_argv.copy()
+            self.var_pargs = copy_sig.var_pargs
+            self.var_kargs = copy_sig.var_kargs
         else:
-            argspec = inspect.getargspec(f)
+            if isinstance(f, types.MethodType) \
+                    or isinstance(f, classmethod) \
+                    or isinstance(f, staticmethod):
+                argspec = inspect.getargspec(f.__func__)
+            else:
+                argspec = inspect.getargspec(f)
 
-        if isinstance(f, types.MethodType):
-            self.pargl = (argspec[0])[1:]
-        else:
-            self.pargl = (argspec[0])[:]
+            if isinstance(f, types.MethodType):
+                self.pargl = (argspec[0])[1:]
+            else:
+                self.pargl = (argspec[0])[:]
 
-        if argspec[3] is not None:
-            def_offset = len(self.pargl) - len(argspec[3])
-            self.def_argv = dict((self.pargl[def_offset+i],argspec[3][i]) for i in xrange(len(argspec[3])))
-        else:
-            self.def_argv = {}
+            if argspec[3] is not None:
+                def_offset = len(self.pargl) - len(argspec[3])
+                self.def_argv = dict((self.pargl[def_offset+i],argspec[3][i]) for i in xrange(len(argspec[3])))
+            else:
+                self.def_argv = {}
 
-        # For future support of Python 3 keyword-only arguments
-        self.kargl = {}
+            # For future support of Python 3 keyword-only arguments
+            self.kargl = {}
 
-        self.var_pargs = argspec[1] is not None
-        self.var_kargs = argspec[2] is not None
+            self.var_pargs = argspec[1] is not None
+            self.var_kargs = argspec[2] is not None
 
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
@@ -48,10 +55,10 @@ class partial(object):
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
             # Bind instance method
-            return self.__class__(types.MethodType(self.f, inst))
+            return self.__class__(types.MethodType(self.f, inst), argv=self.argv)
         else:
             # Bind class or static method
-            return self.__class__(self.f.__get__(None, owner))
+            return self.__class__(self.f.__get__(None, owner), argv=self.argv)
 
     def __call__(self, *apply_pv, **apply_kv):
         new_argv = self.argv.copy()
@@ -77,24 +84,24 @@ class partial(object):
         app_argv = self.def_argv.copy()
         app_argv.update(new_argv)
 
-        fully_applied = True
+        app_ready = True
         for name in self.pargl:
             if not app_argv.has_key(name):
-                fully_applied = False
+                app_ready = False
                 break
 
-        if fully_applied:
+        if app_ready:
             for name in self.kargl.keys():
                 if not app_argv.has_key(name):
-                    fully_applied = False
+                    app_ready = False
                     break
 
-        if fully_applied:
+        if app_ready:
             fpargs = [new_argv[n] for n in self.pargl if new_argv.has_key(n)] + extra_argv
             fkargs = dict((key,val) for key,val in new_argv.iteritems() if not (key in self.pargl))
             return self.f(*fpargs, **fkargs)
         else:
-            return self.__class__(self.f, argv=new_argv)
+            return self.__class__(self.f, argv=new_argv, copy_sig=self)
 
 class pointfree(partial):
     """@pointfree function decorator
@@ -106,10 +113,10 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        return self.__class__(lambda *a: self(g(*a)), copy_sig=g)
+        return self.__class__(lambda *p,**k: self(g.f(*p,**k)), argv=g.argv, copy_sig=g)
 
     def __rshift__(self, g):
-        return self.__class__(lambda *a: g(self(*a)), copy_sig=self)
+        return self.__class__(lambda *p,**k: g(self.f(*p,**k)), argv=self.argv, copy_sig=self)
 
 @pointfree
 def ignore(iterator):

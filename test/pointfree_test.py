@@ -284,6 +284,16 @@ class PointfreeFuncCase(unittest.TestCase):
         f = cmul(2) >> cadd(3)
         self.assertEqual(f(5), 13)
 
+class PointfreeFuncMultipleArgCase(unittest.TestCase):
+    def setUp(self):
+        self.f = cadd(1) * cmul
+
+    def testNormalApplication(self):
+        self.assertEqual(self.f(3,4), 13)
+
+    def testPartialApplication(self):
+        self.assertEqual(self.f(3)(4), 13)
+
 ### END TESTS #############################################################
 
 if __name__ == '__main__':
