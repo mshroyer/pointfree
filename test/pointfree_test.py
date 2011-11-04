@@ -261,6 +261,36 @@ def cadd(a, b):
 def cmul(a, b):
     return a * b
 
+class PointfreeThing(object):
+    m = 1
+
+    def __init__(self, n):
+        self.n = n
+
+    @pointfree
+    def instance_cadd(self, a, b, c):
+        return self.n + a + 2*b + 3*c
+
+    @pointfree
+    @classmethod
+    def class_cadd(klass, a, b, c):
+        return klass.m + a + 2*b + 3*c
+
+    @pointfree
+    @staticmethod
+    def static_cadd(a, b, c):
+        return a + 2*b + 3*c
+
+    @classmethod
+    @pointfree
+    def class_cadd_in(klass, a, b, c):
+        return klass.m + a + 2*b + 3*c
+
+    @staticmethod
+    @pointfree
+    def static_cadd_in(a, b, c):
+        return a + 2*b + 3*c
+
 ### POINTFREE OPERATOR TESTS ##############################################
 
 class PointfreeFuncCase(unittest.TestCase):
@@ -294,7 +324,7 @@ class PointfreeFuncMultipleArgCase(unittest.TestCase):
     def testPartialApplication(self):
         self.assertEqual(self.f(3)(4), 13)
 
-class ChainedOperatorsCase(unittest.TestCase):
+class PointfreeChainedOperatorsCase(unittest.TestCase):
     def testMultipleCompOperators(self):
         f = cadd(2) * cmul(3) * cadd(4)
         self.assertEqual(f(1), 17)
@@ -304,6 +334,20 @@ class ChainedOperatorsCase(unittest.TestCase):
             >> cmul(3) \
             >> cadd(4)
         self.assertEqual(f(1), 13)
+
+class PointfreeMethodCase(unittest.TestCase):
+    def setUp(self):
+        self.i = PointfreeThing(2)
+
+    def testNormalApplication(self):
+        f = self.i.instance_cadd(1,2) * self.i.instance_cadd(3,4)
+        self.assertEqual(f(1), 55)
+
+    def testPartialApplication(self):
+        f = self.i.instance_cadd(1,2) * self.i.instance_cadd
+        self.assertEqual(f(3,4,1), 55)
+        self.assertEqual(f(3)(4)(1), 55)
+        self.assertEqual(f(c=1)(3)(4), 55)
 
 ### END TESTS #############################################################
 
