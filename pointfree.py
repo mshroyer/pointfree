@@ -48,25 +48,32 @@ class partial(object):
 
     """
 
-    def __init__(self, f, argvals={}):
+    def __init__(self, f, argvals={}, copy=None):
         self.f = f
         self.argvals = argvals
 
-        if isinstance(f, types.MethodType) \
-                or isinstance(f, classmethod) \
-                or isinstance(f, staticmethod):
-            argspec = inspect.getargspec(f.__func__)
+        if copy is None: copy = f
+        if isinstance(copy, partial):
+            self.args      = [a for a in copy.args if not copy.argvals.has_key(a)]
+            self.defaults  = [a for a in copy.defaults if (a in self.args)]
+            self.var_args  = copy.var_args
+            self.var_kargs = copy.var_kargs
         else:
-            argspec = inspect.getargspec(f)
+            if isinstance(f, types.MethodType) \
+                    or isinstance(f, classmethod) \
+                    or isinstance(f, staticmethod):
+                argspec    = inspect.getargspec(f.__func__)
+            else:
+                argspec    = inspect.getargspec(f)
 
-        if isinstance(f, types.MethodType):
-            self.args = (argspec[0])[1:]
-        else:
-            self.args = (argspec[0])[:]
+            if isinstance(f, types.MethodType):
+                self.args  = (argspec[0])[1:]
+            else:
+                self.args  = (argspec[0])[:]
 
-        self.var_args  = argspec[1] is not None
-        self.var_kargs = argspec[2] is not None
-        self.defaults  = argspec[3] if argspec[3] is not None else ()
+            self.defaults  = argspec[3] if argspec[3] is not None else ()
+            self.var_args  = argspec[1] is not None
+            self.var_kargs = argspec[2] is not None
 
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
@@ -127,10 +134,10 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        return self.__class__(lambda *a: self(g(*a)))
+        return self.__class__(lambda *a: self(g(*a)), copy=g)
 
     def __rshift__(self, g):
-        return self.__class__(lambda *a: g(self(*a)))
+        return self.__class__(lambda *a: g(self(*a)), copy=self)
 
 @pointfree
 def ignore(iterator):
