@@ -25,6 +25,10 @@ def padd_var_kargs(a, b, **kargs):
 def padd_var_args_kargs(a, b, *args, **kargs):
     return (a + 2*b + 3*sum(args), kargs)
 
+@partial
+def padd_var_args_defaults(a, b, c=3, *args):
+    return a + 2*b + 3*c + 4*sum(args)
+
 class PartialThing(object):
     m = 1
 
@@ -170,6 +174,20 @@ class PartialFuncVarArgsKargsCase(unittest.TestCase):
         val,kargs = padd_var_args_kargs(1,c=5)(d=6)(2,3,4)
         self.assertEqual(val, 26)
         self.assertDictEqual(kargs, {'c': 5, 'd': 6})
+
+class PartialFuncVarArgsDefaultsCase(unittest.TestCase):
+    def testNormalApplication(self):
+        self.assertEqual(padd_var_args_defaults(1,2), 14)
+        self.assertEqual(padd_var_args_defaults(1,2,4), 17)
+        self.assertEqual(padd_var_args_defaults(1,2,4,5), 37)
+
+    def testPartialApplication(self):
+        self.assertEqual(padd_var_args_defaults(1)(2), 14)
+        self.assertEqual(padd_var_args_defaults(1)(2,4), 17)
+        self.assertEqual(padd_var_args_defaults(1)(2,4,5), 37)
+
+    def testPartialKwargApplication(self):
+        self.assertEqual(padd_var_args_defaults(b=2)(1,4,5), 37)
 
 class PartialMethodCase(unittest.TestCase):
     def setUp(self):
