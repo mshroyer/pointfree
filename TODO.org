@@ -2,6 +2,14 @@
 
 #+STARTUP: content logdone
 
+* Supporting multiple Python versions
+** Python 2
+*** TODO Run test suite in Python 2.6
+*** TODO Run test suite in Python 2.5
+** Python 3
+*** TODO Research supporting 2&3 with the same module
+    Does setuptools or distutils have some mechanism to automate 2to3 in a
+    module installation or something?
 * Partial application decorator
 ** TODO Look into preserving more function metadata
    Investigate how the @decorator decorator preserves original function
@@ -21,4 +29,6 @@
 ** TODO Find non-setuptools test execution solution
 * Documentation
 ** TODO What's the Pythonic way to present full module documentation?
-** TODO Add examples to README.md
+   Sphinx with reStructuredText?
+** TODO Migrate README.md to reStructuredText
+** TODO Add examples to README
