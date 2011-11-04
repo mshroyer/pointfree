@@ -39,7 +39,8 @@ class partial(object):
 
             if argspec[3] is not None:
                 def_offset = len(self.pargl) - len(argspec[3])
-                self.def_argv = dict((self.pargl[def_offset+i],argspec[3][i]) for i in xrange(len(argspec[3])))
+                self.def_argv = dict((self.pargl[def_offset+i],argspec[3][i]) \
+                                         for i in xrange(len(argspec[3])))
             else:
                 self.def_argv = {}
 
@@ -57,10 +58,10 @@ class partial(object):
     def __get__(self, inst, owner=None):
         if hasattr(self.f, '__call__'):
             # Bind instance method
-            return self.__class__(types.MethodType(self.f, inst), argv=self.argv)
+            return self.__class__(types.MethodType(self.f, inst))
         else:
             # Bind class or static method
-            return self.__class__(self.f.__get__(None, owner), argv=self.argv)
+            return self.__class__(self.f.__get__(None, owner))
 
     def __call__(self, *apply_pv, **apply_kv):
         new_argv = self.argv.copy()
@@ -100,7 +101,7 @@ class partial(object):
 
         if app_ready:
             fpargs = [new_argv[n] for n in self.pargl if new_argv.has_key(n)] + extra_argv
-            fkargs = dict((key,val) for key,val in new_argv.iteritems() if not (key in self.pargl))
+            fkargs = dict((key,val) for key,val in new_argv.iteritems() if not key in self.pargl)
             return self.f(*fpargs, **fkargs)
         else:
             return self.__class__(self.f, argv=new_argv, copy_sig=self)
