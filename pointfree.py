@@ -56,12 +56,7 @@ class partial(object):
             self.__name__ = f.__name__
 
     def __get__(self, inst, owner=None):
-        if hasattr(self.f, '__call__'):
-            # Bind instance method
-            return self.__class__(types.MethodType(self.f, inst))
-        else:
-            # Bind class or static method
-            return self.__class__(self.f.__get__(None, owner))
+        return self.__class__(self.f.__get__(inst, owner))
 
     def __call__(self, *apply_pv, **apply_kv):
         new_argv = self.argv.copy()
