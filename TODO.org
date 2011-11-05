@@ -9,11 +9,13 @@
 ** Python 3
 *** TODO Test in Python 3.0
 *** TODO Test in Python 3.1
-*** TODO Test in Python 3.2
+*** DONE Test in Python 3.2
+    CLOSED: [2011-11-05 Sat 17:38]
 *** DONE Research supporting 2&3 with the same module
     CLOSED: [2011-11-04 Fri 02:32]
     Does setuptools or distutils have some mechanism to automate 2to3 in a
     module installation or something?
+*** TODO Add keyword-only arguments support
 * Partial application decorator
 ** DONE Look into preserving more function metadata
    CLOSED: [2011-11-05 Sat 17:18]
