@@ -41,3 +41,4 @@
 ** TODO Fully specify behavior in inline documentation
 ** TODO Migrate README.md to reStructuredText
 ** TODO Add examples to README
+** TODO Add Python license info
