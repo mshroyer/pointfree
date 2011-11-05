@@ -8,18 +8,6 @@ __all__     = ['partial', 'pointfree', 'ignore', 'printfn']
 
 import sys, inspect, types
 
-# Gloss over differences in Python 2/3 dictionary methods...
-if sys.version_info >= (3,0):
-    def dict_has_key(dictionary, key):
-        return (key in dictionary)
-    def dict_items(dictionary):
-        return dictionary.items()
-else:
-    def dict_has_key(dictionary, key):
-        return dictionary.has_key(key)
-    def dict_items(dictionary):
-        return dictionary.iteritems()
-
 class partial(object):
     """@partial function decorator
 
@@ -88,7 +76,7 @@ class partial(object):
         for v in apply_pv:
             arg_i = None
             for name in self.pargl:
-                if not dict_has_key(new_argv, name):
+                if not name in new_argv:
                     arg_i = name
                     break
 
@@ -97,7 +85,7 @@ class partial(object):
             else:
                 extra_argv.append(v)
 
-        for k,v in dict_items(apply_kv):
+        for k,v in apply_kv.items():
             if not (self.var_kargs or (k in self.pargl) or (k in self.kargl.keys())):
                 raise TypeError("%s() got an unexpected keyword argument '%s'" % (self.__name__, k))
             new_argv[k] = v
@@ -107,19 +95,19 @@ class partial(object):
 
         app_ready = True
         for name in self.pargl:
-            if not dict_has_key(app_argv, name):
+            if not name in app_argv:
                 app_ready = False
                 break
 
         if app_ready:
             for name in self.kargl.keys():
-                if not dict_has_key(app_argv, name):
+                if not name in app_argv:
                     app_ready = False
                     break
 
         if app_ready:
-            fpargs = [new_argv[n] for n in self.pargl if dict_has_key(new_argv, n)] + extra_argv
-            fkargs = dict((key,val) for key,val in dict_items(new_argv) if not key in self.pargl)
+            fpargs = [new_argv[n] for n in self.pargl if n in new_argv] + extra_argv
+            fkargs = dict((key,val) for key,val in new_argv.items() if not key in self.pargl)
             return self.f(*fpargs, **fkargs)
         else:
             return self.__class__(self.f, argv=new_argv, copy_sig=self)
