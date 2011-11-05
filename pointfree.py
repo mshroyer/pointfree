@@ -24,6 +24,16 @@ class partial(object):
             self.def_argv  = copy_sig.def_argv.copy()
             self.var_pargs = copy_sig.var_pargs
             self.var_kargs = copy_sig.var_kargs
+
+        # Don't attempt to read arguments directly from raw classmethod or
+        # staticmethod instances because there doesn't seem to be a good
+        # way to access their underlying function objects in Python 2.6.
+        # This isn't much of an issue in practice because when we __get__()
+        # the method using its descriptor it will be converted to an
+        # instancemethod or a function, respectively, and then passed as
+        # such to the initializer of a new partial object; the only
+        # consequence is that we cannot use partial objects for class or
+        # static methods extracted directly from their owner's __dict__.
         elif not (isinstance(f, classmethod) or isinstance(f, staticmethod)):
             if isinstance(f, types.MethodType):
                 argspec = inspect.getargspec(f.__func__)
