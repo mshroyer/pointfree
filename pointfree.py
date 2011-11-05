@@ -4,6 +4,8 @@ __author__  = "Mark Shroyer"
 __email__   = "code@markshroyer.com"
 __version__ = 0.1
 
+__all__     = ['partial', 'pointfree', 'ignore', 'printfn']
+
 import sys, inspect, types
 
 # Gloss over differences in Python 2/3 dictionary methods...
