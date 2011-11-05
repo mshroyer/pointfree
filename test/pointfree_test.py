@@ -3,6 +3,19 @@
 import os, sys, unittest, types
 from pointfree import partial, pointfree
 
+# Python 2.6's unittest.TestCase doesn't have some of the methods that we
+# use in our test suite, so...
+if hasattr(unittest.TestCase, 'assertIsInstance') \
+        and hasattr(unittest.TestCase, 'assertDictEqual'):
+    from unittest import TestCase
+else:
+    class TestCase(unittest.TestCase):
+        def assertIsInstance(self, f, klass):
+            self.assertTrue(isinstance(f, klass))
+
+        def assertDictEqual(self, a, b):
+            self.assertTrue(a == b)
+
 ### PARTIAL APPLICATION FIXTURES ##########################################
 
 @partial
@@ -61,7 +74,7 @@ class PartialThing(object):
 
 ### PARTIAL APPLICATION TESTS #############################################
 
-class PartialFuncCase(unittest.TestCase):
+class PartialFuncCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd(1,2,3), 14)
 
@@ -85,7 +98,7 @@ class PartialFuncCase(unittest.TestCase):
         self.assertEqual(padd(b=2)(1)(3), 14)
         self.assertEqual(padd(b=2)(1,3), 14)
 
-class PartialFuncDefaultsCase(unittest.TestCase):
+class PartialFuncDefaultsCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_defaults(1,2), 14)
 
@@ -95,7 +108,7 @@ class PartialFuncDefaultsCase(unittest.TestCase):
     def testKeywordOverride(self):
         self.assertEqual(padd_defaults(c=4)(1,2), 17)
 
-class PartialFuncConcurrencyCase(unittest.TestCase):
+class PartialFuncConcurrencyCase(TestCase):
     def testReusedPartialApplication(self):
         p = padd(1)
         self.assertEqual(p(2,3), 14)
@@ -104,7 +117,7 @@ class PartialFuncConcurrencyCase(unittest.TestCase):
         # must be able to reuse it.
         self.assertEqual(p(2)(3), 14)
 
-class PartialFuncErrorCase(unittest.TestCase):
+class PartialFuncErrorCase(TestCase):
     def testTooManyArgsError(self):
         self.assertRaises(TypeError, lambda: padd(1,2,3,4))
 
@@ -128,7 +141,7 @@ class PartialFuncErrorCase(unittest.TestCase):
         self.assertEqual(padd(1,2,3,a=4,b=5,c=6), 32)
         self.assertEqual(padd(1,2)(a=3)(4), 19)
 
-class PartialFuncVarArgsCase(unittest.TestCase):
+class PartialFuncVarArgsCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_args(1,2), 5)
 
@@ -141,7 +154,7 @@ class PartialFuncVarArgsCase(unittest.TestCase):
     def testVarArgsPartialApplication(self):
         self.assertEqual(padd_var_args(1)(2,3,4,5), 41)
 
-class PartialFuncVarKargsCase(unittest.TestCase):
+class PartialFuncVarKargsCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_kargs(1,2)[0], 5)
 
@@ -161,7 +174,7 @@ class PartialFuncVarKargsCase(unittest.TestCase):
         self.assertEqual(val, 5)
         self.assertDictEqual(kargs, {'c': 3, 'd': 4})
 
-class PartialFuncVarArgsKargsCase(unittest.TestCase):
+class PartialFuncVarArgsKargsCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_args_kargs(1,2)[0], 5)
 
@@ -175,7 +188,7 @@ class PartialFuncVarArgsKargsCase(unittest.TestCase):
         self.assertEqual(val, 26)
         self.assertDictEqual(kargs, {'c': 5, 'd': 6})
 
-class PartialFuncVarArgsDefaultsCase(unittest.TestCase):
+class PartialFuncVarArgsDefaultsCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(padd_var_args_defaults(1,2), 14)
         self.assertEqual(padd_var_args_defaults(1,2,4), 17)
@@ -189,7 +202,7 @@ class PartialFuncVarArgsDefaultsCase(unittest.TestCase):
     def testPartialKwargApplication(self):
         self.assertEqual(padd_var_args_defaults(b=2)(1,4,5), 37)
 
-class PartialMethodCase(unittest.TestCase):
+class PartialMethodCase(TestCase):
     def setUp(self):
         self.inst = PartialThing(2)
 
@@ -199,7 +212,7 @@ class PartialMethodCase(unittest.TestCase):
     def testPartialApplication(self):
         self.assertEqual(self.inst.instance_padd(1)(2)(3), 16)
 
-class PartialClassMethodCase(unittest.TestCase):
+class PartialClassMethodCase(TestCase):
     def setUp(self):
         self.inst = PartialThing(2)
 
@@ -211,7 +224,7 @@ class PartialClassMethodCase(unittest.TestCase):
         self.assertEqual(self.inst.class_padd(1)(2)(3), 15)
         self.assertEqual(PartialThing.class_padd(1)(2)(3), 15)
 
-class PartialStaticMethodCase(unittest.TestCase):
+class PartialStaticMethodCase(TestCase):
     def setUp(self):
         self.inst = PartialThing(2)
 
@@ -223,7 +236,7 @@ class PartialStaticMethodCase(unittest.TestCase):
         self.assertEqual(self.inst.static_padd(1)(2)(3), 14)
         self.assertEqual(PartialThing.static_padd(1)(2)(3), 14)
 
-class PartialClassMethodInnerCase(unittest.TestCase):
+class PartialClassMethodInnerCase(TestCase):
     def setUp(self):
         self.inst = PartialThing(2)
 
@@ -239,7 +252,7 @@ class PartialClassMethodInnerCase(unittest.TestCase):
         self.assertEqual(self.inst.class_padd_in(1)(2)(3), 15)
         self.assertEqual(PartialThing.class_padd_in(1)(2)(3), 15)
 
-class PartialStaticMethodInnerCase(unittest.TestCase):
+class PartialStaticMethodInnerCase(TestCase):
     def setUp(self):
         self.inst = PartialThing(2)
 
@@ -293,7 +306,7 @@ class PointfreeThing(object):
 
 ### POINTFREE OPERATOR TESTS ##############################################
 
-class PointfreeFuncCase(unittest.TestCase):
+class PointfreeFuncCase(TestCase):
     def testNormalApplication(self):
         self.assertEqual(cadd(2,3), 5)
         self.assertEqual(cmul(2,3), 6)
@@ -314,7 +327,7 @@ class PointfreeFuncCase(unittest.TestCase):
         f = cmul(2) >> cadd(3)
         self.assertEqual(f(5), 13)
 
-class PointfreeFuncMultipleArgCase(unittest.TestCase):
+class PointfreeFuncMultipleArgCase(TestCase):
     def setUp(self):
         self.f = cadd(1) * cmul
 
@@ -324,7 +337,7 @@ class PointfreeFuncMultipleArgCase(unittest.TestCase):
     def testPartialApplication(self):
         self.assertEqual(self.f(3)(4), 13)
 
-class PointfreeChainedOperatorsCase(unittest.TestCase):
+class PointfreeChainedOperatorsCase(TestCase):
     def testMultipleCompOperators(self):
         f = cadd(2) * cmul(3) * cadd(4)
         self.assertEqual(f(1), 17)
@@ -335,7 +348,7 @@ class PointfreeChainedOperatorsCase(unittest.TestCase):
             >> cadd(4)
         self.assertEqual(f(1), 13)
 
-class PointfreeMethodCase(unittest.TestCase):
+class PointfreeMethodCase(TestCase):
     def setUp(self):
         self.i = PointfreeThing(2)
 

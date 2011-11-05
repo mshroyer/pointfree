@@ -24,17 +24,12 @@ class partial(object):
             self.def_argv  = copy_sig.def_argv.copy()
             self.var_pargs = copy_sig.var_pargs
             self.var_kargs = copy_sig.var_kargs
-        else:
-            if isinstance(f, types.MethodType) \
-                    or isinstance(f, classmethod) \
-                    or isinstance(f, staticmethod):
-                argspec = inspect.getargspec(f.__func__)
-            else:
-                argspec = inspect.getargspec(f)
-
+        elif not (isinstance(f, classmethod) or isinstance(f, staticmethod)):
             if isinstance(f, types.MethodType):
+                argspec = inspect.getargspec(f.__func__)
                 self.pargl = (argspec[0])[1:]
             else:
+                argspec = inspect.getargspec(f)
                 self.pargl = (argspec[0])[:]
 
             if argspec[3] is not None:
