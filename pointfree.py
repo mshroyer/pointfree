@@ -8,6 +8,13 @@ __all__     = ['partial', 'pointfree', 'ignore', 'printfn']
 
 import sys, inspect, types
 
+# getfullargspec wasn't invented yet back when Python 2 roamed the earth.
+if hasattr(inspect, 'getfullargspec'):
+    from inspect import getfullargspec
+else:
+    def getfullargspec(f):
+        return inspect.getargspec(f) + ([], None, {})
+
 class partial(object):
     """@partial function decorator
 
@@ -22,30 +29,30 @@ class partial(object):
 
         if copy_sig is not None:
             self.pargl     = list(copy_sig.pargl)
-            self.kargl     = copy_sig.kargl.copy()
+            self.kargl     = list(copy_sig.kargl)
             self.def_argv  = copy_sig.def_argv.copy()
             self.var_pargs = copy_sig.var_pargs
             self.var_kargs = copy_sig.var_kargs
         else:
             if isinstance(f, types.MethodType):
-                argspec = inspect.getargspec(f.__func__)
+                argspec = getfullargspec(f.__func__)
                 self.pargl = (argspec[0])[1:]
             elif isinstance(f, classmethod):
                 if hasattr(f, '__func__'):
-                    argspec = inspect.getargspec(f.__func__)
+                    argspec = getfullargspec(f.__func__)
                 else:
                     # No classmethod.__func__ in Python 2.6
-                    argspec = inspect.getargspec(f.__get__(1).__func__)
+                    argspec = getfullargspec(f.__get__(1).__func__)
                 self.pargl = (argspec[0])[1:]
             elif isinstance(f, staticmethod):
                 if hasattr(f, '__func__'):
-                    argspec = inspect.getargspec(f.__func__)
+                    argspec = getfullargspec(f.__func__)
                 else:
                     # No staticmethod.__func__ in Python 2.6
-                    argspec = inspect.getargspec(f.__get__(1))
+                    argspec = getfullargspec(f.__get__(1))
                 self.pargl = (argspec[0])[:]
             else:
-                argspec = inspect.getargspec(f)
+                argspec = getfullargspec(f)
                 self.pargl = (argspec[0])[:]
 
             if argspec[3] is not None:
@@ -56,7 +63,7 @@ class partial(object):
                 self.def_argv = {}
 
             # For future support of Python 3 keyword-only arguments
-            self.kargl = {}
+            self.kargl = []
 
             self.var_pargs = argspec[1] is not None
             self.var_kargs = argspec[2] is not None
@@ -86,7 +93,7 @@ class partial(object):
                 extra_argv.append(v)
 
         for k,v in apply_kv.items():
-            if not (self.var_kargs or (k in self.pargl) or (k in self.kargl.keys())):
+            if not (self.var_kargs or (k in self.pargl) or (k in self.kargl)):
                 raise TypeError("%s() got an unexpected keyword argument '%s'" % (self.__name__, k))
             new_argv[k] = v
 
@@ -100,7 +107,7 @@ class partial(object):
                 break
 
         if app_ready:
-            for name in self.kargl.keys():
+            for name in self.kargl:
                 if not name in app_argv:
                     app_ready = False
                     break
