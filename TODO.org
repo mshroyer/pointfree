@@ -4,8 +4,10 @@
 
 * Supporting multiple Python versions
 ** Python 2
-*** TODO Test in Python 2.6
-*** TODO Test in Python 2.5
+*** DONE Test in Python 2.6
+    CLOSED: [2011-11-04 Fri 20:02]
+*** DONE Test in Python 2.5
+    CLOSED: [2011-11-04 Fri 20:18]
 ** Python 3
 *** TODO Test in Python 3.0
 *** TODO Test in Python 3.1
@@ -36,5 +38,6 @@
 * Documentation
 ** TODO What's the Pythonic way to present full module documentation?
    Sphinx with reStructuredText?
+** TODO Fully specify behavior in inline documentation
 ** TODO Migrate README.md to reStructuredText
 ** TODO Add examples to README
