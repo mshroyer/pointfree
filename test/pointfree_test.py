@@ -362,6 +362,54 @@ class PointfreeMethodCase(TestCase):
         self.assertEqual(f(3)(4)(1), 55)
         self.assertEqual(f(c=1)(3)(4), 55)
 
+class PointfreeClassMethodCase(TestCase):
+    def setUp(self):
+        self.i = PointfreeThing(2)
+
+    def testNormalApplicationFromInstance(self):
+        f = self.i.class_cadd(1,2) * self.i.class_cadd(3,4)
+        self.assertEqual(f(1), 51)
+
+    def testNormalApplicationFromClass(self):
+        g = PointfreeThing.class_cadd(1,2) * PointfreeThing.class_cadd(3,4)
+        self.assertEqual(g(1), 51)
+
+    def testPartialApplicationFromInstance(self):
+        f = self.i.class_cadd(1,2) * self.i.class_cadd
+        self.assertEqual(f(1,2,3), 51)
+        self.assertEqual(f(1)(2)(3), 51)
+        self.assertEqual(f(c=3)(1)(2), 51)
+
+    def testPartialApplicationFromClass(self):
+        f = PointfreeThing.class_cadd(1,2) * PointfreeThing.class_cadd
+        self.assertEqual(f(1,2,3), 51)
+        self.assertEqual(f(1)(2)(3), 51)
+        self.assertEqual(f(c=3)(1)(2), 51)
+
+class PointfreeStaticMethodCase(TestCase):
+    def setUp(self):
+        self.i = PointfreeThing(2)
+
+    def testNormalApplicationFromInstance(self):
+        f = self.i.static_cadd(1,2) * self.i.static_cadd(3,4)
+        self.assertEqual(f(1), 47)
+
+    def testNormalApplicationFromClass(self):
+        f = PointfreeThing.static_cadd(1,2) * PointfreeThing.static_cadd(3,4)
+        self.assertEqual(f(1), 47)
+
+    def testPartialApplicationFromInstance(self):
+        f = self.i.static_cadd(1,2) * self.i.static_cadd
+        self.assertEqual(f(1,2,3), 47)
+        self.assertEqual(f(1)(2)(3), 47)
+        self.assertEqual(f(c=3)(1)(2), 47)
+
+    def testPartialApplicationFromClass(self):
+        f = PointfreeThing.static_cadd(1,2) * PointfreeThing.static_cadd
+        self.assertEqual(f(1,2,3), 47)
+        self.assertEqual(f(1)(2)(3), 47)
+        self.assertEqual(f(c=3)(1)(2), 47)
+
 ### END TESTS #############################################################
 
 if __name__ == '__main__':

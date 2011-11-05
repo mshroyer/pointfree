@@ -31,7 +31,8 @@
    applicable functions?  Should we just attempt to evaluate on the very
    first invocation?
 * Unit tests
-** TODO Test pointfree on instance, class, static methods 
+** DONE Test pointfree on instance, class, static methods 
+   CLOSED: [2011-11-05 Sat 01:51]
 ** DONE Find non-setuptools test execution solution
    CLOSED: [2011-11-05 Sat 01:30]
 * Documentation
