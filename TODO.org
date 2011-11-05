@@ -1,5 +1,3 @@
--*- mode: org; -*-
-
 #+STARTUP: content logdone
 
 * Supporting multiple Python versions
@@ -34,7 +32,8 @@
    first invocation?
 * Unit tests
 ** TODO Test pointfree on instance, class, static methods 
-** TODO Find non-setuptools test execution solution
+** DONE Find non-setuptools test execution solution
+   CLOSED: [2011-11-05 Sat 01:30]
 * Documentation
 ** TODO What's the Pythonic way to present full module documentation?
    Sphinx with reStructuredText?
@@ -42,3 +41,6 @@
 ** TODO Migrate README.md to reStructuredText
 ** TODO Add examples to README
 ** TODO Add Python license info
+* Misc
+** DONE Convert project back to distutils
+   CLOSED: [2011-11-05 Sat 01:30]
