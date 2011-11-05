@@ -15,7 +15,8 @@
     Does setuptools or distutils have some mechanism to automate 2to3 in a
     module installation or something?
 * Partial application decorator
-** TODO Look into preserving more function metadata
+** DONE Look into preserving more function metadata
+   CLOSED: [2011-11-05 Sat 17:18]
    Investigate how the @decorator decorator preserves original function
    metadata so that e.g. inspect.getargspec() still returns the original
    result.
