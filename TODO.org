@@ -4,11 +4,11 @@
 ** Python 2
 *** DONE Test in Python 2.6
     CLOSED: [2011-11-04 Fri 20:02]
-*** DONE Test in Python 2.5
-    CLOSED: [2011-11-04 Fri 20:18]
 ** Python 3
-*** TODO Test in Python 3.0
-*** TODO Test in Python 3.1
+*** DONE Test in Python 3.0
+    CLOSED: [2011-11-06 Sun 01:14]
+*** DONE Test in Python 3.1
+    CLOSED: [2011-11-06 Sun 00:48]
 *** DONE Test in Python 3.2
     CLOSED: [2011-11-05 Sat 17:38]
 *** DONE Research supporting 2&3 with the same module
@@ -17,6 +17,10 @@
     module installation or something?
 *** DONE Add keyword-only arguments support
     CLOSED: [2011-11-05 Sat 23:55]
+** Other Python implementations
+*** TODO Test in IronPython
+*** DONE Test in PyPy
+    CLOSED: [2011-11-06 Sun 00:54]
 * Partial application decorator
 ** DONE Look into preserving more function metadata
    CLOSED: [2011-11-05 Sat 17:18]
@@ -43,7 +47,8 @@
 ** TODO Look into whether more composite function tests are needed
    Do we need to write more tests for the @pointfree decorator?  What about
    when used with keyword arguments?
-** TODO Go over existing unit tests, refactor as necessary
+** DONE Go over existing unit tests, refactor as necessary
+   CLOSED: [2011-11-06 Sun 01:25]
 * Documentation
 ** TODO What's the Pythonic way to present full module documentation?
    Sphinx with reStructuredText?
@@ -54,4 +59,5 @@
 * Misc
 ** DONE Convert project back to distutils
    CLOSED: [2011-11-05 Sat 01:30]
-** TODO Consolidate copy_sig and argv arguments to partial.__init__
+** TODO Review distutils project layout
+   How is this normally done?

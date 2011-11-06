@@ -93,8 +93,8 @@ class PartialFuncCase(TestCase):
         self.assertEqual(padd(c=3)(1,2), 14)
 
     def testPartialKeywordsOutOfOrder(self):
-        self.assertEqual(padd(b=2)(1)(3), 14)
-        self.assertEqual(padd(b=2)(1,3), 14)
+        self.assertEqual(padd(b=2)(a=1)(3), 14)
+        self.assertEqual(padd(b=2)(c=3)(a=1), 14)
 
 class PartialFuncDefaultsCase(TestCase):
     def testNormalApplication(self):
@@ -113,6 +113,7 @@ class PartialFuncConcurrencyCase(TestCase):
 
         # Fully applying p the first time shouldn't change its state; we
         # must be able to reuse it.
+        self.assertIsInstance(p(), partial)
         self.assertEqual(p(2)(3), 14)
 
 class PartialFuncErrorCase(TestCase):
