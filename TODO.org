@@ -54,18 +54,20 @@
 ** DONE Go over existing unit tests, refactor as necessary
    CLOSED: [2011-11-06 Sun 01:25]
 * Documentation
-** TODO What's the Pythonic way to present full module documentation?
+** DONE What's the Pythonic way to present full module documentation?
+   CLOSED: [2011-11-06 Sun 15:31]
    Sphinx with reStructuredText?
 ** TODO Fully specify behavior in inline documentation
 ** TODO Migrate README.md to reStructuredText
 ** TODO Add examples to README
-** TODO Add Python license info
+** DONE Add Apache License 2.0 info
+   CLOSED: [2011-11-06 Sun 16:02]
 * Misc
 ** DONE Convert project back to distutils
    CLOSED: [2011-11-05 Sat 01:30]
-** TODO Review distutils project layout
+** DONE Review distutils project layout
+   CLOSED: [2011-11-06 Sun 15:24]
    How is this normally done?
-
 ** DONE Figure out what happens to methods of old-style objects
    CLOSED: [2011-11-06 Sun 13:03]
    What happens, exactly, when you try to apply the partial or pointfree
