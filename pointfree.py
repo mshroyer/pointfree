@@ -78,11 +78,12 @@ class partial(object):
             else:
                 self.def_argv = {}
 
-            # For future support of Python 3 keyword-only arguments
-            self.kargl = []
-
             self.var_pargs = argspec[1] is not None
             self.var_kargs = argspec[2] is not None
+            self.kargl     = argspec[4]
+
+            # We need keyword-only arguments' default values too.
+            self.def_argv.update(argspec[6])
 
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
@@ -92,45 +93,50 @@ class partial(object):
     def __get__(self, inst, owner=None):
         return self.__class__(self.f.__get__(inst, owner))
 
-    def __call__(self, *apply_pv, **apply_kv):
+    def __call__(self, *new_pargs, **new_kargs):
         new_argv = self.argv.copy()
         extra_argv = []
 
-        for v in apply_pv:
-            arg_i = None
+        for v in new_pargs:
+            arg_name = None
             for name in self.pargl:
                 if not name in new_argv:
-                    arg_i = name
+                    arg_name = name
                     break
 
-            if arg_i:
-                new_argv[arg_i] = v
-            else:
+            if arg_name:
+                new_argv[arg_name] = v
+            elif self.var_pargs:
                 extra_argv.append(v)
+            else:
+                num_prev_pargs = len([name for name in self.pargl if name in self.argv])
+                raise TypeError("%s() takes exactly %d positional arguments (%d given)" \
+                                    % (self.__name__, len(self.pargl), num_prev_pargs + len(new_pargs)))
 
-        for k,v in apply_kv.items():
+        for k,v in new_kargs.items():
             if not (self.var_kargs or (k in self.pargl) or (k in self.kargl)):
-                raise TypeError("%s() got an unexpected keyword argument '%s'" % (self.__name__, k))
+                raise TypeError("%s() got an unexpected keyword argument '%s'" \
+                                    % (self.__name__, k))
             new_argv[k] = v
 
-        app_argv = self.def_argv.copy()
-        app_argv.update(new_argv)
+        applic_argv = self.def_argv.copy()
+        applic_argv.update(new_argv)
 
-        app_ready = True
+        applic_ready = True
         for name in self.pargl:
-            if not name in app_argv:
-                app_ready = False
+            if not name in applic_argv:
+                applic_ready = False
                 break
 
-        if app_ready:
+        if applic_ready:
             for name in self.kargl:
-                if not name in app_argv:
-                    app_ready = False
+                if not name in applic_argv:
+                    applic_ready = False
                     break
 
-        if app_ready:
+        if applic_ready:
             fpargs = [new_argv[n] for n in self.pargl if n in new_argv] + extra_argv
-            fkargs = dict((key,val) for key,val in new_argv.items() if not key in self.pargl)
+            fkargs = dict((n,v) for n,v in new_argv.items() if not n in self.pargl)
             return self.f(*fpargs, **fkargs)
         else:
             return self.__class__(self.f, argv=new_argv, copy_sig=self)
