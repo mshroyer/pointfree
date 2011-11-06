@@ -1,8 +1,8 @@
 import os, sys, unittest, types
 from pointfree import *
 
-# Python 2.6's unittest.TestCase doesn't have some of the methods that we
-# use in our test suite, so...
+# The unittest.TestCase in Python 2.6 and 3.0 doesn't have some of the
+# methods that we use in our test suite, so...
 if hasattr(unittest.TestCase, 'assertIsInstance') \
         and hasattr(unittest.TestCase, 'assertDictEqual'):
     from unittest import TestCase

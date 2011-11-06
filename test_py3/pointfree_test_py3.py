@@ -1,5 +1,5 @@
-from unittest import TestCase
 from pointfree import *
+from test.pointfree_test import TestCase
 
 ### KEYWORD-ONLY FUNCTION FIXTURES ########################################
 
