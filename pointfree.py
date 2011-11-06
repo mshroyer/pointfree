@@ -83,7 +83,8 @@ class partial(object):
             self.kargl     = argspec[4]
 
             # We need keyword-only arguments' default values too.
-            self.def_argv.update(argspec[6])
+            if argspec[5] is not None:
+                self.def_argv.update(argspec[5])
 
         if hasattr(f, '__doc__'):
             self.__doc__ = f.__doc__
