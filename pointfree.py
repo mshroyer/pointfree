@@ -86,10 +86,8 @@ class partial(object):
             if argspec[5] is not None:
                 self.def_argv.update(argspec[5])
 
-        if hasattr(f, '__doc__'):
-            self.__doc__ = f.__doc__
-        if hasattr(f, '__name__'):
-            self.__name__ = f.__name__
+        self.__doc__  = f.__doc__  if hasattr(f, '__doc__')  else ''
+        self.__name__ = f.__name__ if hasattr(f, '__name__') else '<unnamed>'
 
     def __get__(self, inst, owner=None):
         return self.__class__(self.f.__get__(inst, owner))
