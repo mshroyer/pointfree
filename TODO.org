@@ -18,9 +18,12 @@
 *** DONE Add keyword-only arguments support
     CLOSED: [2011-11-05 Sat 23:55]
 ** Other Python implementations
-*** TODO Test in IronPython
+*** DONE Test in IronPython
+    CLOSED: [2011-11-06 Sun 13:14]
+    Works in IronPython 2.7.1
 *** DONE Test in PyPy
     CLOSED: [2011-11-06 Sun 00:54]
+    Works in PyPy 1.6.0
 * Partial application decorator
 ** DONE Look into preserving more function metadata
    CLOSED: [2011-11-05 Sat 17:18]
