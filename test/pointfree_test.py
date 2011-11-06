@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 import os, sys, unittest, types
-from pointfree import partial, pointfree
+from pointfree import *
 
 # Python 2.6's unittest.TestCase doesn't have some of the methods that we
 # use in our test suite, so...
@@ -409,6 +407,16 @@ class PointfreeStaticMethodCase(TestCase):
         self.assertEqual(f(1,2,3), 47)
         self.assertEqual(f(1)(2)(3), 47)
         self.assertEqual(f(c=3)(1)(2), 47)
+
+### PYTHON 3 KW-ONLY ARGS TESTS ###########################################
+
+# We can't lump the Python 3 keyword-only argument tests in here with the
+# rest, because Python 2 doesn't recognize the keyword-only syntax and will
+# fail to compile the module.  Instead we define these tests in a separate
+# module and conditionally import them here...
+
+if sys.version_info >= (3,0):
+    from test_py3.pointfree_test_py3 import *
 
 ### END TESTS #############################################################
 
