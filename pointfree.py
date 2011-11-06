@@ -26,50 +26,36 @@ class partial(object):
     def __init__(self, f, argv={}, copy_sig=None):
         self.f = f
         self.argv = argv.copy()
+        self.__call_error = None
 
         if copy_sig is not None:
-            # Copy the signature from an existing partial instance.
-
             self.pargl     = list(copy_sig.pargl)
             self.kargl     = list(copy_sig.kargl)
             self.def_argv  = copy_sig.def_argv.copy()
             self.var_pargs = copy_sig.var_pargs
             self.var_kargs = copy_sig.var_kargs
 
+        elif isinstance(f, classmethod) or isinstance(f, staticmethod):
+            self.__call_error = "'%s' object is not callable" % type(f).__name__
+
         else:
             # Extract function signature, default arguments, keyword-only
             # arguments, and whether or not variable positional or keyword
-            # arguments are allowed.  This also supports calling decorated
-            # unbound instance, class, or static methods, though the only
-            # time those would come into play would be if you called read
-            # such a method directly from its owner's __dict__ (bypassing
-            # the method object's own __get__ descriptor method).
+            # arguments are allowed.  This also supports calling unbound
+            # instance methods by passing an object instance as the first
+            # argument; however, unbound classmethod and staticmethod
+            # objects are not callable, so we do not attempt to support
+            # them here.
 
             if isinstance(f, types.MethodType):
                 # A bound instance or class method.
                 argspec = getfullargspec(f.__func__)
-                self.pargl = (argspec[0])[1:]
-            elif isinstance(f, classmethod):
-                # An unbound class method.
-                if hasattr(f, '__func__'):
-                    argspec = getfullargspec(f.__func__)
-                else:
-                    # No classmethod.__func__ in Python 2.6
-                    argspec = getfullargspec(f.__get__(1).__func__)
-                self.pargl = (argspec[0])[1:]
-            elif isinstance(f, staticmethod):
-                # An unbound static method.
-                if hasattr(f, '__func__'):
-                    argspec = getfullargspec(f.__func__)
-                else:
-                    # No staticmethod.__func__ in Python 2.6
-                    argspec = getfullargspec(f.__get__(1))
-                self.pargl = (argspec[0])[:]
+                self.pargl = argspec[0][1:]
             else:
                 # A regular function, an unbound instance method, or a
                 # bound static method.
                 argspec = getfullargspec(f)
-                self.pargl = (argspec[0])[:]
+                self.pargl = argspec[0][:]
 
             if argspec[3] is not None:
                 def_offset = len(self.pargl) - len(argspec[3])
@@ -93,6 +79,9 @@ class partial(object):
         return self.__class__(self.f.__get__(inst, owner))
 
     def __call__(self, *new_pargs, **new_kargs):
+        if self.__call_error:
+            raise TypeError(self.__call_error)
+
         new_argv = self.argv.copy()
         extra_argv = []
 

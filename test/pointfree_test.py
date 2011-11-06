@@ -263,6 +263,17 @@ class PartialStaticMethodInnerCase(TestCase):
         self.assertEqual(self.inst.static_padd_in(1)(2)(3), 14)
         self.assertEqual(PartialThing.static_padd_in(1)(2)(3), 14)
 
+class PartialUnboundMethodsCase(TestCase):
+    def setUp(self):
+        self.inst = PartialThing(2)
+        self.instance_padd = PartialThing.__dict__['instance_padd']
+
+    def testInstanceMethodNormalApplication(self):
+        self.assertEqual(self.instance_padd(self.inst,1,2,3), 16)
+
+    def testInstanceMethodPartialApplication(self):
+        self.assertEqual(self.instance_padd(self.inst)(1,2)(3), 16)
+
 ### POINTFREE OPERATOR FIXTURES ###########################################
 
 @pointfree
