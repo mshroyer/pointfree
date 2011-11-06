@@ -428,7 +428,7 @@ class PointfreeStaticMethodCase(TestCase):
 # module and conditionally import them here...
 
 if sys.version_info >= (3,0):
-    from test_py3.pointfree_test_py3 import *
+    from test.pointfree_py3 import *
 
 ### END TESTS #############################################################
 
