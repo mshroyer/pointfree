@@ -15,7 +15,8 @@
     CLOSED: [2011-11-04 Fri 02:32]
     Does setuptools or distutils have some mechanism to automate 2to3 in a
     module installation or something?
-*** TODO Add keyword-only arguments support
+*** DONE Add keyword-only arguments support
+    CLOSED: [2011-11-05 Sat 23:55]
 * Partial application decorator
 ** DONE Look into preserving more function metadata
    CLOSED: [2011-11-05 Sat 17:18]
@@ -38,6 +39,11 @@
    CLOSED: [2011-11-05 Sat 01:51]
 ** DONE Find non-setuptools test execution solution
    CLOSED: [2011-11-05 Sat 01:30]
+** TODO Write test for unbound instance, class, static methods
+** TODO Look into whether more composite function tests are needed
+   Do we need to write more tests for the @pointfree decorator?  What about
+   when used with keyword arguments?
+** TODO Go over existing unit tests, refactor as necessary
 * Documentation
 ** TODO What's the Pythonic way to present full module documentation?
    Sphinx with reStructuredText?
@@ -48,3 +54,4 @@
 * Misc
 ** DONE Convert project back to distutils
    CLOSED: [2011-11-05 Sat 01:30]
+** TODO Consolidate copy_sig and argv arguments to partial.__init__
