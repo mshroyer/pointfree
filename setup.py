@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 
-import os
 from distutils.core import setup
-
-def read(fname):
-    with open(os.path.join(os.path.dirname(__file__), fname)) as f:
-        return f.read()
 
 setup(
     name='pointfree',
@@ -14,5 +9,20 @@ setup(
     author='Mark Shroyer',
     author_email='code@markshroyer.com',
     url='https://github.com/markshroyer/python-pointfree',
-    py_modules=['pointfree']
+    py_modules=['pointfree'],
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'License :: OSI Approved :: Apache Software License',
+        'Intended Audience :: Developers',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.0',
+        'Programming Language :: Python :: 3.1',
+        'Programming Language :: Python :: 3.2',
+        'Operating System :: OS Independent',
+        'Topic :: Software Development',
+        ]
     )
