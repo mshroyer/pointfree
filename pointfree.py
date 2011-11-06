@@ -8,7 +8,7 @@ __all__     = ['partial', 'pointfree', 'ignore', 'printfn']
 
 import sys, inspect, types
 
-# getfullargspec wasn't invented yet back when Python 2 roamed the earth.
+# No getfullargspec in Python 2, since there are no keyword-only arguments.
 if hasattr(inspect, 'getfullargspec'):
     from inspect import getfullargspec
 else:
@@ -28,16 +28,29 @@ class partial(object):
         self.argv = argv.copy()
 
         if copy_sig is not None:
+            # Copy the signature from an existing partial instance.
+
             self.pargl     = list(copy_sig.pargl)
             self.kargl     = list(copy_sig.kargl)
             self.def_argv  = copy_sig.def_argv.copy()
             self.var_pargs = copy_sig.var_pargs
             self.var_kargs = copy_sig.var_kargs
+
         else:
+            # Extract function signature, default arguments, keyword-only
+            # arguments, and whether or not variable positional or keyword
+            # arguments are allowed.  This also supports calling decorated
+            # unbound instance, class, or static methods, though the only
+            # time those would come into play would be if you called read
+            # such a method directly from its owner's __dict__ (bypassing
+            # the method object's own __get__ descriptor method).
+
             if isinstance(f, types.MethodType):
+                # A bound instance or class method.
                 argspec = getfullargspec(f.__func__)
                 self.pargl = (argspec[0])[1:]
             elif isinstance(f, classmethod):
+                # An unbound class method.
                 if hasattr(f, '__func__'):
                     argspec = getfullargspec(f.__func__)
                 else:
@@ -45,6 +58,7 @@ class partial(object):
                     argspec = getfullargspec(f.__get__(1).__func__)
                 self.pargl = (argspec[0])[1:]
             elif isinstance(f, staticmethod):
+                # An unbound static method.
                 if hasattr(f, '__func__'):
                     argspec = getfullargspec(f.__func__)
                 else:
@@ -52,6 +66,8 @@ class partial(object):
                     argspec = getfullargspec(f.__get__(1))
                 self.pargl = (argspec[0])[:]
             else:
+                # A regular function, an unbound instance method, or a
+                # bound static method.
                 argspec = getfullargspec(f)
                 self.pargl = (argspec[0])[:]
 
