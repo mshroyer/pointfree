@@ -408,7 +408,7 @@ class PointfreeStaticMethodCase(TestCase):
         self.assertEqual(f(1)(2)(3), 47)
         self.assertEqual(f(c=3)(1)(2), 47)
 
-### PYTHON 3 KW-ONLY ARGS TESTS ###########################################
+### PYTHON 3 KEYWORD-ONLY ARGS TESTS ######################################
 
 # We can't lump the Python 3 keyword-only argument tests in here with the
 # rest, because Python 2 doesn't recognize the keyword-only syntax and will

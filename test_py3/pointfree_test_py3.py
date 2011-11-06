@@ -1,6 +1,8 @@
 from unittest import TestCase
 from pointfree import *
 
+### KEYWORD-ONLY FUNCTION FIXTURES ########################################
+
 def kwonly_pure_func(a, b, *, c):
     return a + b + c
 
@@ -15,6 +17,8 @@ def kwonly_defaults_func(a, b, *, c=3):
 @partial
 def kwonly_varkw_func(a, b, *, c, **kwargs):
     return (a + b + c, kwargs)
+
+### KEYWORD-ONLY FUNCTION TESTS ###########################################
 
 class KwOnlyArgsCase(TestCase):
     def testNormalApplication(self):
@@ -46,3 +50,5 @@ class KwOnlyAndVarKargsCase(TestCase):
         value, kwargs = kwonly_varkw_func(1,2,c=3,d=4,e=5)
         self.assertEqual(value, 6)
         self.assertDictEqual(kwargs, {'d': 4, 'e': 5})
+
+### END TESTS #############################################################
