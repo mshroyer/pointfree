@@ -61,3 +61,10 @@
    CLOSED: [2011-11-05 Sat 01:30]
 ** TODO Review distutils project layout
    How is this normally done?
+
+** TODO Figure out what happens to methods of old-style objects
+   What happens, exactly, when you try to apply the partial or pointfree
+   decorator to a method of an old-style class?
+** TODO Examine decorator ordering for class/static pointfree methods
+   What happens when you apply @staticmethod or @classmethod above
+   @pointfree?
