@@ -1,3 +1,32 @@
+"""
+python-pointfree: Pointfree style support for Python
+
+https://github.com/markshroyer/python-pointfree
+
+Pointfree provides support for the point-free programming style in Python.
+It works in CPython versions 2.6, 2.7, 3.0, 3.1, and 3.2, as well as PyPy
+1.6.0 and IronPython 2.7.1.  In Python 3, keyword-only arguments are fully
+supported.
+
+See the documentation for the partial and pointfree classes, below, for
+details on usage.
+
+Copyright 2011 Mark Shroyer
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License.  You may obtain a copy
+of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+License for the specific language governing permissions and limitations
+under the License.
+
+"""
+
 from __future__ import print_function
 
 __author__  = "Mark Shroyer"
@@ -16,10 +45,28 @@ else:
         return inspect.getargspec(f) + ([], None, {})
 
 class partial(object):
-    """@partial function decorator
+    """Decorator for automatic partial application
 
-    Converts a regular Python function into one supporting a form of
-    partial application.  Supports positional arguments only.
+    Converts a regular Python function or method into one supporting
+    automatic partial application.
+
+    >>> @partial
+    ... def foo(a,b,c):
+    ...     return a + b + c
+    >>> foo(1,2,3)
+    6
+    >>> foo(1)(2)(3)
+    6
+
+    Arguments can be grouped in any combination:
+
+    >>> foo(1,2)(3)
+    6
+    >>> foo(1)(2,3)
+    6
+
+    Generally speaking, the evaluation strategy is to apply all supplied
+    arguments to the underlying function as soon as possible.
 
     """
 
@@ -130,11 +177,11 @@ class partial(object):
             return self.__class__(self.f, argv=new_argv, copy_sig=self)
 
 class pointfree(partial):
-    """@pointfree function decorator
+    """Decorator for function composition operators
 
-    Converts a regular Python function into one which can be composed with
-    other Python functions using the * and >> operators.  Functions with
-    this decorator also automatically support partial application.
+    Converts a Python function or method into one supporting composition
+    via the * and >> operators.  Pointfree objects also support automatic
+    partial application (see the partial class, above).
 
     """
 
