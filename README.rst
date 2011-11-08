@@ -51,121 +51,120 @@ for full details::
 FAQ
 ---
 
-  * **Q. Python already includes a partial application class in the
-    standard library's functools module; why not just use that?**
+* **Q. Python already includes a partial application class in the standard
+  library's functools module; why not just use that?**
 
-    There are two major reasons that I felt the need to write a new
-    implementation of partial function application for this module.
+  There are two major reasons that I felt the need to write a new
+  implementation of partial function application for this module.
 
-    First, use of the function composition operators provided by the
-    ``pointfree`` decorator requires cooperation between the partial
-    application mechanism and the implementation of overloaded operators;
-    the result of a partial application must be an object which defines the
-    necessary operators, so at the very least I would need to wrap the
-    standard library ``partial`` anyway.
+  First, use of the function composition operators provided by the
+  ``pointfree`` decorator requires cooperation between the partial
+  application mechanism and the implementation of overloaded operators; the
+  result of a partial application must be an object which defines the
+  necessary operators, so at the very least I would need to wrap the
+  standard library ``partial`` anyway.
 
-    The second reason is a matter of subjective taste.  The standard
-    library's ``partial`` class requires explicit creation of a new object
-    every time you wish to perform partial application and then a separate
-    call in order to actually invoke the underlying function, and this is
-    more verbose and (in my opinion) less elegant than I would like.  For a
-    contrived example::
+  The second reason is a matter of subjective taste.  The standard
+  library's ``partial`` class requires explicit creation of a new object
+  every time you wish to perform partial application and then a separate
+  call in order to actually invoke the underlying function, and this is
+  more verbose and (in my opinion) less elegant than I would like.  For a
+  contrived example::
 
-        >>> from functools import partial
-                
-        >>> def add_thrice(a, b, c):
-        ...     return a + b + c
-        
-        >>> plusone = partial(add_thrice, 1)
-        >>> plusone(2, 3)
-        6
-        >>> plusthree = partial(plusone, 2)
-        >>> plusthree(3)
-        6
+      >>> from functools import partial
+              
+      >>> def add_thrice(a, b, c):
+      ...     return a + b + c
+      
+      >>> plusone = partial(add_thrice, 1)
+      >>> plusone(2, 3)
+      6
+      >>> plusthree = partial(plusone, 2)
+      >>> plusthree(3)
+      6
 
-    In contrast, pointfree's ``partial`` decorator lets you perform partial
-    application with the same syntax as "full" application::
+  In contrast, pointfree's ``partial`` decorator lets you perform partial
+  application with the same syntax as "full" application::
 
-        >>> from pointfree import partial
+      >>> from pointfree import partial
+      
+      >>> @partial
+      ... def add_thrice(a, b, c):
+      ...     return a + b + c
+      
+      >>> plusone = add_thrice(1)
+      >>> plusone(2, 3)
+      6
+      >>> plusthree = plusone(2)
+      >>> plusthree(3)
+      6
 
-        >>> @partial
-        ... def add_thrice(a, b, c):
-        ...     return a + b + c
+  There are also several minor ways in which the functools ``partial``
+  object is not ideal for supporting the pointfree style.  If you have a
+  function of two arguments and you specify the first as a keyword
+  argument, you cannot then specify the second positionally in a subsequent
+  application; this would prevent such a partially-applied function from
+  being composed with other functions::
 
-        >>> plusone = add_thrice(1)
-        >>> plusone(2, 3)
-        6
-        >>> plusthree = plusone(2)
-        >>> plusthree(3)
-        6
+      >>> from functools import partial
+      
+      >>> def add(a, b):
+      ...     return a + b
+      
+      >>> p = partial(add, a=1)
+      >>> p(2)
+      Traceback (most recent call last):
+          ...
+      TypeError: add() got multiple values for keyword argument 'a'
 
-    There are also several minor ways in which the functools ``partial``
-    object is not ideal for supporting the pointfree style.  If you have a
-    function of two arguments and you specify the first as a keyword
-    argument, you cannot then specify the second positionally in a
-    subsequent application; this would prevent such a partially-applied
-    function from being composed with other functions::
+  Whereas you can do this with pointfree, due to its slightly different
+  semantics for positional argument application (which is fully described
+  in the decorator's API reference)::
 
-        >>> from functools import partial
-        
-        >>> def add(a, b):
-        ...     return a + b
-        
-        >>> p = partial(add, a=1)
-        >>> p(2)
-        Traceback (most recent call last):
-            ...
-        TypeError: add() got multiple values for keyword argument 'a'
+      >>> from pointfree import partial
+      
+      >>> @partial
+      ... def add(a, b):
+      ...     return a + b
+      
+      >>> p = add(a=1)
+      >>> p(2)
+      3
 
-    Whereas you can do this with pointfree, due to its slightly different
-    semantics for positional argument application (which is fully described
-    in the decorator's API reference)::
+  Also, with the standard library's partial class you don't see errors
+  immediately when you apply invalid positional or keyword arguments; the
+  exception is only raised when you then ``__call__`` the partial object::
 
-        >>> from pointfree import partial
-	
-	>>> @partial
-	... def add(a, b):
-	...     return a + b
-	
-	>>> p = add(a=1)
-	>>> p(2)
-	3
+      >>> from functools import partial
+      
+      >>> def add(a, b):
+      ...     return a + b
+      
+      >>> p = partial(add, c=3) # No error is raised yet
+      >>> q = partial(p, 1)     # Still no error
+      >>> q(2)                  # Now we get an error!
+      Traceback (most recent call last):
+          ...
+      TypeError: add() got an unexpected keyword argument 'c'
 
-    Also, with the standard library's partial class you don't see errors
-    immediately when you apply invalid positional or keyword arguments; the
-    exception is only raised when you then ``__call__`` the partial
-    object::
+  But with pointfree's partial application, the error is raised
+  immediately::
 
-        >>> from functools import partial
-	
-	>>> def add(a, b):
-	...     return a + b
-	
-	>>> p = partial(add, c=3) # No error is raised yet
-	>>> q = partial(p, 1)     # Still no error
-	>>> q(2)                  # Now we get an error!
-	Traceback (most recent call last):
-	    ...
-	TypeError: add() got an unexpected keyword argument 'c'
+      >>> from pointfree import partial
+      
+      >>> @partial
+      ... def add(a, b):
+      ...     return a + b
+      
+      >>> p = add(c=3)
+      Traceback (most recent call last):
+          ...
+      TypeError: add() got an unexpected keyword argument 'c'
 
-    But with pointfree's partial application, the error is raised
-    immediately::
+* **Q. OK, so what are the disadvantages to pointfree's partial
+  decorator?**
 
-        >>> from pointfree import partial
-	
-	>>> @partial
-	... def add(a, b):
-	...     return a + b
-	
-	>>> p = add(c=3)
-	Traceback (most recent call last):
-	    ...
-	TypeError: add() got an unexpected keyword argument 'c'
-
-  * **Q. OK, so what are the disadvantages to pointfree's partial
-    decorator?**
-
-    There are none.  It is perfect.
+  *TODO*
 
 
 Author
