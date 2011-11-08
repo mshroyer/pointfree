@@ -86,3 +86,6 @@
    Accept positional and keyword arguments to __init__ as arguments to the
    partial function.  This would require finding another way to specify
    copy_sig= and argv=.
+** TODO Rename printfn, ignore to reflect their operation on iterators
+** TODO Consider alternate composition operators
+   Perhaps use a pipe rather than rshift for forward composition?

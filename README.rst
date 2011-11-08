@@ -13,40 +13,68 @@ Specifically, it provides:
 
 The objective is to support the `pointfree programming style
 <http://www.haskell.org/haskellwiki/Pointfree>`_ in a lightweight and easy
-to use manner -- and in particular, to serve as a more convenient syntax
-for the kind of generator chaining described in David Beazley's PyCon 2008
-presentation, `"Generator Tricks for Systems Programmers"
+to use manner -- and in particular, to serve as a nice syntax for the kind
+of generator chaining described in David Beazley's PyCon 2008 presentation,
+`"Generator Tricks for Systems Programmers"
 <http://www.dabeaz.com/generators/Generators.pdf>`_.
 
 
 Examples
 --------
 
-pointfree's ``partial`` decorator lets you create functions and methods
-that support automatic partial application.  This means that you can do the
-following::
+The ``pointfree`` decorator lets you partially apply and compose functions,
+including generator functions.  Building upon an example from Beazley's
+presentation, suppose you have the following functions for operating on
+lines of text::
 
     >>> from pointfree import *
+    >>> import re
     
-    >>> @partial
-    ... def adder(a,b,c):
-    ...     return a + 2*b + 3*c
+    >>> @pointfree
+    ... def gen_grep(pat, lines):
+    ...     patc = re.compile(pat)
+    ...     for line in lines:
+    ...         if patc.search(line):
+    ...             yield line
     
-    >>> adder(1,2,3)
-    14
-    >>> adder(1)(2)(3)
-    14
+    >>> @pointfree
+    ... def gen_repeat(times, lines):
+    ...     for line in lines:
+    ...         for n in range(times):
+    ...             yield line
 
-Keyword arguments are fully supported (including PEP 3102 keyword-only
-arguments on Python 3).  However, note that there are some subtle
-differences from standard Python function application in how keyword and
-positional arguments are mixed together; please refer to the API reference
-for full details::
+    >>> @pointfree
+    ... def gen_upcase(lines):
+    ...	    for line in lines:
+    ...         yield line.upper()
+    
+And you have several lines of text::
 
-    >>> adder(a=1,b=2,c=3)
-    14
-    >>> adder(1)(2,c=3)
-    14
+    >>> input = \
+    ... """roses are red
+    ... violets are blue
+    ... I like generators
+    ... and this isn't a poem
+    ... um let's see...
+    ... oh yeah and daffodils are flowers too""".split("\n")
+
+Now suppose you want to find just the lines that contain the name of a
+flower and print them, twice, in upper case.  The given functions can be
+combined to do so, as follows::
+
+    >>> f = gen_grep(r'(roses|violets|daffodils)') \
+    ...     >> gen_upcase \
+    ...     >> gen_repeat(2) \
+    ...     >> printfn
+    
+    >>> f(input)
+    ROSES ARE RED
+    ROSES ARE RED
+    VIOLETS ARE BLUE
+    VIOLETS ARE BLUE
+    OH YEAH AND DAFFODILS ARE FLOWERS TOO
+    OH YEAH AND DAFFODILS ARE FLOWERS TOO
+
 
 FAQ
 ---
@@ -161,10 +189,45 @@ FAQ
           ...
       TypeError: add() got an unexpected keyword argument 'c'
 
-* **Q. OK, so what are the disadvantages to pointfree's partial
+* **Q. OK, so what are the disadvantages of pointfree's partial
   decorator?**
 
-  *TODO*
+  pointfree's ``partial`` implementation does not work on CPython's builtin
+  functions::
+
+      >>> from pointfree import partial
+      
+      >>> partial(pow)(y=3)
+      Traceback (most recent call last):
+          ...
+      TypeError: <built-in function pow> is not a Python function
+
+  Also, with the pointfree implementation you cannot specify optional
+  positional arguments in *multiple* applications, because evaluation will
+  occur automatically as soon as enough arguments have been specified.  So,
+  for instance, with functools ``partial``::
+
+      >>> from functools import partial
+      
+      >>> def add_all(*argv):
+      ...     return sum(argv)
+      
+      >>> f = partial(add_all, 1, 2)
+      >>> g = partial(f, 3, 4)
+      >>> g(5)
+      15
+
+  Whereas with pointfree, the function would be evaluated as soon as it has
+  been supplied any arguments::
+
+      >>> from pointfree import partial
+      
+      >>> partial(add_all)(1, 2)
+      3
+
+  Despite these limitations, I prefer the brevity of the pointfree
+  implementation (which is of course why I wrote it).  Naturally, your
+  mileage may vary.
 
 
 Author

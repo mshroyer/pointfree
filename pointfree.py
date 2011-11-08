@@ -197,4 +197,5 @@ def ignore(iterator):
 
 @pointfree
 def printfn(output):
-    print(output)
+    for item in output:
+        print(item)
