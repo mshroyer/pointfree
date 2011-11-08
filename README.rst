@@ -48,9 +48,9 @@ lines of text::
     ...	    for line in lines:
     ...         yield line.upper()
     
-And you have several lines of text::
+And you have some text too::
 
-    >>> input = \
+    >>> bad_poetry = \
     ... """roses are red
     ... violets are blue
     ... I like generators
@@ -58,22 +58,64 @@ And you have several lines of text::
     ... um let's see...
     ... oh yeah and daffodils are flowers too""".split("\n")
 
-Now suppose you want to find just the lines that contain the name of a
-flower and print them, twice, in upper case.  The given functions can be
-combined to do so, as follows::
+Now suppose you want to find just the lines of your text that contain the
+name of a flower and print them, twice, in upper case.  The given functions
+can be combined to do so as follows, using pointfree's automatic partial
+application and function composition operators::
 
     >>> f = gen_grep(r'(roses|violets|daffodils)') \
     ...     >> gen_upcase \
     ...     >> gen_repeat(2) \
     ...     >> printfn
     
-    >>> f(input)
+    >>> f(bad_poetry)
     ROSES ARE RED
     ROSES ARE RED
     VIOLETS ARE BLUE
     VIOLETS ARE BLUE
     OH YEAH AND DAFFODILS ARE FLOWERS TOO
     OH YEAH AND DAFFODILS ARE FLOWERS TOO
+
+In addition to the ``>>`` operator for "forward" composition, functions can
+also be composed with the ``*`` operator.  (This is intended to be
+remniscent of the circle operator "∘" from algebra.)::
+
+    >>> @pointfree
+    ... def f(x):
+    ...     return x**2
+    
+    >>> @pointfree
+    ... def g(x):
+    ...     return x+1
+    
+    >>> h = f * g
+    >>> h(2)
+    9
+
+And of course you don't have to define your methods using decorator
+notation in order to use pointfree's features; you can directly instantiate
+the class from an existing function or method::
+
+    >>> (pointfree(lambda x: x*2) * pointfree(lambda x: x+1))(3)
+    8
+
+If you want to use pointfree's automatic partial application support but
+not the composition operators, you can use the ``@partial`` decorator
+instead::
+
+    >>> @partial
+    ... def add_three(a, b, c):
+    ...     return a + b + c
+    
+    >>> add_three(1)(2)(3)
+    6
+
+(Using the ``@pointfree`` decorator imbues a superset of the capabilities
+provided by ``@partial``.)
+
+pointfree's partial application support has some intentional differences
+from normal Python function application semantics.  Please refer to the API
+reference for details.
 
 
 FAQ
