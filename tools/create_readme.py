@@ -6,7 +6,8 @@
 # Mark Shroyer
 # Tue Nov  8 22:14:45 EST 2011
 
-import os, re
+import re
+from os.path import realpath, dirname, join
 
 def section_delimiter(line):
     if len(line) == 0:
@@ -51,8 +52,10 @@ class RstReader(object):
             section.add_line(line)
 
 if __name__ == '__main__':
-    reader = RstReader(os.path.join("doc", "overview.rst"))
-    with open("README.rst", "w") as out_file:
+    project_root = realpath(join(dirname(__file__), '..'))
+
+    reader = RstReader(join(project_root, "doc", "overview.rst"))
+    with open(join(project_root, "README.rst"), "w") as out_file:
         for section in reader.sections:
             if section.name in set(["Introduction", "Examples"]):
                 print >> out_file, section.get_text()
