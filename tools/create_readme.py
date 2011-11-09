@@ -24,8 +24,9 @@ class RstSection(object):
         self.lines = []
 
     def add_line(self, line):
-        sub_line = re.sub(r':(?:[\w\d]+:)+`([\w\d\.]+)`', r'``\1``', line)
-        self.lines.append(sub_line)
+        sub1_line = re.sub(r':(?:[\w\d]+:)+`~(?:[\w\d]+\.)+([\w\d]+)`', r'``\1``', line)
+        sub2_line = re.sub(r':(?:[\w\d]+:)+`([\w\d\.]+)`', r'``\1``', sub1_line)
+        self.lines.append(sub2_line)
 
     def get_text(self):
         return "\n".join(self.lines)

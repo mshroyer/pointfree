@@ -22,7 +22,7 @@ of generator chaining described in David Beazley's PyCon 2008 presentation,
 Examples
 --------
 
-The :py:class:`~pointfree.pointfree` decorator lets you partially apply and
+The ``pointfree`` decorator lets you partially apply and
 compose functions, including generator functions.  Building upon an example
 from Beazley's presentation, suppose you have the following functions for
 operating on lines of text::
@@ -93,14 +93,14 @@ remniscent of the circle operator "∘" from algebra.)::
     9
 
 And of course you don't have to define your methods using decorator
-notation in order to use :py:class:`~pointfree.pointfree`; you can directly
+notation in order to use ``pointfree``; you can directly
 instantiate the class from an existing function or method::
 
     >>> (pointfree(lambda x: x*2) * pointfree(lambda x: x+1))(3)
     8
 
 If you want to use automatic partial application but not the composition
-operators, you can use the module's :py:class:`~pointfree.partial`
+operators, you can use the module's ``partial``
 decorator instead::
 
     >>> @partial
@@ -110,8 +110,8 @@ decorator instead::
     >>> add_three(1)(2)(3)
     6
 
-(Using the :py:class:`~pointfree.pointfree` decorator imbues a superset of
-the capabilities provided by :py:class:`~pointfree.partial`.)
+(Using the ``pointfree`` decorator imbues a superset of
+the capabilities provided by ``partial``.)
 
 pointfree's partial application support has some intentional differences
 from normal Python function application semantics.  Please refer to the API
