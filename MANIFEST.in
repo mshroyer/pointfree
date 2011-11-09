@@ -1,3 +1,5 @@
 recursive-include test *.py
-include README.md
+recursive-include tools *.py
+recursive-include doc Makefile make.bat *.rst *.py
+include README.rst
 include LICENSE.txt
