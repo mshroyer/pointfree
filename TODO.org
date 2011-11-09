@@ -58,8 +58,10 @@
    CLOSED: [2011-11-06 Sun 15:31]
    Sphinx with reStructuredText?
 ** TODO Fully specify behavior in inline documentation
-** TODO Migrate README.md to reStructuredText
-** TODO Add examples to README
+** DONE Migrate README.md to reStructuredText
+   CLOSED: [2011-11-08 Tue 01:57]
+** DONE Add examples to README
+   CLOSED: [2011-11-08 Tue 01:57]
 ** DONE Add Apache License 2.0 info
    CLOSED: [2011-11-06 Sun 16:02]
 ** TODO Add literate doctest comments

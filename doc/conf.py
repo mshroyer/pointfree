@@ -25,7 +25,11 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx']
+
+intersphinx_mapping = {
+    'py': ('http://docs.python.org/2.7', None),
+    }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -178,7 +182,7 @@ htmlhelp_basename = 'pointfreedoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'pointfree.tex', u'pointfree Documentation',
+  ('index', 'pointfree.tex', u'pointfree documentation',
    u'Mark Shroyer', 'manual'),
 ]
 
@@ -211,6 +215,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pointfree', u'pointfree Documentation',
+    ('index', 'pointfree', u'pointfree documentation',
      [u'Mark Shroyer'], 1)
 ]

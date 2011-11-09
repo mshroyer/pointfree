@@ -132,7 +132,7 @@ FAQ
   application mechanism and the implementation of overloaded operators; the
   result of a partial application must be an object which defines the
   necessary operators, so at the very least I would need to wrap
-  :py:class:`functools.partial` anyway.
+  :py:func:`functools.partial` anyway.
 
   The second reason is a matter of subjective taste.  The standard
   library's ``partial`` class requires explicit creation of a new object
