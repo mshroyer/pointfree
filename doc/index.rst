@@ -14,6 +14,7 @@ constructs more convenient to use in Python.
 
    overview
    api
+   faq
    license
 
 Indices and tables
