@@ -24,8 +24,14 @@ if __name__ == '__main__':
 
     test_runner = unittest.TextTestRunner(verbosity=1)
 
-    print("Running unit tests from test.pointfree_test:")
+    print("""
+######################################################################
+#               Running unit tests in test/ directory                #
+######################################################################""")
     test_runner.run(unittest_suite)
 
-    print("\nRunning doctests:")
+    print("""
+######################################################################
+#                          Running doctests                          #
+######################################################################""")
     test_runner.run(doctest_suite)

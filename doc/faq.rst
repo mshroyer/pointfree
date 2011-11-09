@@ -114,15 +114,9 @@ FAQ
 * **Q. OK, so what are the disadvantages of pointfree's partial
   decorator?**
 
-  pointfree's ``partial`` implementation does not work on CPython's builtin
-  functions::
-
-      >>> from pointfree import partial
-      
-      >>> partial(pow)(y=3)
-      Traceback (most recent call last):
-          ...
-      TypeError: <built-in function pow> is not a Python function
+  Because Python does not currently expose built-in functions for
+  introspection, the pure-Python :py:func:`pointfree.partial` method does
+  not work with built-in functions.
 
   Also, with the pointfree implementation you cannot specify optional
   positional arguments in *multiple* applications, because evaluation will
