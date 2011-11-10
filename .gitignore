@@ -3,3 +3,4 @@ dist/
 *.pyc
 pointfree.egg-info
 MANIFEST
+TODO.org
