@@ -83,6 +83,12 @@ class partial(object):
         self.extra_argv = []
         self.__call_error = None
 
+        # Set __doc__ and __name__ prior to applying function arguments so
+        # that we can report the error properly if an exception is raised
+        # there...
+        self.__doc__  = func.__doc__  if hasattr(func, '__doc__')  else ''
+        self.__name__ = func.__name__ if hasattr(func, '__name__') else '<unnamed>'
+
         if isinstance(func, partial):
             self.func = func.func
             inst = func
@@ -102,9 +108,6 @@ class partial(object):
             self.__sig_from_func(func)
 
         self.__update_argv(*pargs, **kargs)
-
-        self.__doc__  = func.__doc__  if hasattr(func, '__doc__')  else ''
-        self.__name__ = func.__name__ if hasattr(func, '__name__') else '<unnamed>'
 
     def __sig_from_func(self, func):
         # Extract function signature, default arguments, keyword-only
@@ -176,7 +179,7 @@ class partial(object):
 
     def __new_argv(self, *new_pargs, **new_kargs):
         new_argv = self.argv.copy()
-        extra_argv = []
+        new_extra_argv = list(self.extra_argv)
 
         for v in new_pargs:
             arg_name = None
@@ -188,7 +191,7 @@ class partial(object):
             if arg_name:
                 new_argv[arg_name] = v
             elif self.var_pargs:
-                extra_argv.append(v)
+                new_extra_argv.append(v)
             else:
                 num_prev_pargs = len([name for name in self.pargl if name in self.argv])
                 raise TypeError("%s() takes exactly %d positional arguments (%d given)" \
@@ -200,7 +203,7 @@ class partial(object):
                                     % (self.__name__, k))
             new_argv[k] = v
 
-        return (new_argv, extra_argv)
+        return (new_argv, new_extra_argv)
 
     def __update_argv(self, *pargs, **kargs):
         self.argv, self.extra_argv = self.__new_argv(*pargs, **kargs)
