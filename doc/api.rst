@@ -2,4 +2,13 @@ API reference
 =============
 
 .. automodule:: pointfree
-   :members:
+
+
+Composable helper functions
+---------------------------
+
+.. autofunction:: pfmap(func, iterable)
+
+.. autofunction:: pfreduce(func, iterable[, initial=None])
+
+.. autofunction:: pfcollect(iterable[, n=None])

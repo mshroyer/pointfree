@@ -33,9 +33,16 @@ __author__  = "Mark Shroyer"
 __email__   = "code@markshroyer.com"
 __version__ = 0.1
 
-__all__     = ['partial', 'pointfree', 'ignore', 'printfn']
+__all__ = [
+    'partial',
+    'pointfree',
+    'pfmap',
+    'pfreduce',
+    'pfprint_all',
+    'pfignore_all',
+    ]
 
-import sys, inspect, types
+import sys, inspect, types, itertools
 
 # No getfullargspec in Python 2, since there are no keyword-only arguments.
 if hasattr(inspect, 'getfullargspec'):
@@ -119,8 +126,8 @@ class partial(object):
             if argspec[5] is not None:
                 self.def_argv.update(argspec[5])
 
-        self.__doc__  = f.__doc__  if hasattr(f, '__doc__')  else ''
-        self.__name__ = f.__name__ if hasattr(f, '__name__') else '<unnamed>'
+        self.__doc__    = f.__doc__    if hasattr(f, '__doc__')  else ''
+        self.__name__   = f.__name__   if hasattr(f, '__name__') else '<unnamed>'
 
     def __get__(self, inst, owner=None):
         return self.__class__(self.f.__get__(inst, owner))
@@ -192,10 +199,108 @@ class pointfree(partial):
         return self.__class__(lambda *p,**k: g(self.f(*p,**k)), argv=self.argv, copy_sig=self)
 
 @pointfree
-def ignore(iterator):
-    for x in iterator: pass
+def pfmap(func, iterable):
+    """A pointfree map function: Returns an iterator over the results of
+    applying a function of one argument to the items of a given iterable.
+    The function is provided "lazily" to the given iterable; each function
+    application is performed on the fly as it is requested.
+
+    :param func: A function of one argument to apply to each item
+    :param iterable: An iterator yielding input for the function
+    :rtype: Iterator of function application results
+
+    Example::
+
+        >>> f = pfmap(lambda x: x+1) \\
+        ...     >> pfmap(lambda x: x*2) \\
+        ...     >> pfcollect
+        
+        >>> f(range(5))
+        [2, 4, 6, 8, 10]
+
+    """
+
+    for item in iterable:
+        yield func(item)
 
 @pointfree
-def printfn(output):
-    for item in output:
+def pfreduce(func, iterable, initial=None):
+    """A pointfree reduce function: Applies a function of two arguments
+    cumulatively to the items supplied by the given iterable, so as to
+    reduce the iterable to a single value.  If an initial value is
+    supplied, it is placed before the items from the iterable in the
+    calculation, and serves as the default when the iterable is empty.
+
+    :param func: A function of two arguments
+    :param iterable: An iterable yielding input for the function
+    :param initial: An optional initial input for the function
+    :rtype: Single value
+
+    Example::
+
+        >>> from operator import add
+        
+        >>> sum_of_squares = pfreduce(add, initial=0) * pfmap(lambda n: n**2)
+        >>> sum_of_squares([3, 4, 5, 6])
+        86
+
+    """
+
+    iterator = iterable.__iter__()
+    try:
+        first_item = next(iterator)
+        if initial:
+            value = func(initial, first_item)
+        else:
+            value = first_item
+    except StopIteration:
+        return initial
+
+    for item in iterator:
+        value = func(value, item)
+    return value
+
+@pointfree
+def pfcollect(iterable, n=None):
+    """Collects and returns a list of values from the given iterable.  If
+    the n parameter is not specified, collects all values from the
+    iterable.
+
+    :param iterable: An iterable yielding values for the list
+    :param n: An optional maximum number of items to collect
+    :rtype: List of values from the iterable
+
+    Example::
+
+        >>> @pointfree
+        ... def fibonaccis():
+        ...     a, b = 0, 1
+        ...     while True:
+        ...         a, b = b, a+b
+        ...         yield a
+
+        >>> (pfcollect(n=10) * fibonaccis)()
+        [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+
+    """
+
+    if n:
+        return list(itertools.islice(iterable, n))
+    else:
+        return list(iterable)
+
+@pointfree
+def pfprint_all(iterator):
+    """Pointfree function to print all items from an iterator
+
+    A helper function to 
+
+    """
+
+    for item in iterator:
         print(item)
+
+@pointfree
+def pfignore_all(iterator):
+    for item in iterator:
+        pass

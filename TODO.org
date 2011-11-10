@@ -65,6 +65,10 @@
 ** DONE Add Apache License 2.0 info
    CLOSED: [2011-11-06 Sun 16:02]
 ** TODO Add literate doctest comments
+** DONE Fix doctests on pointfree module
+   CLOSED: [2011-11-09 Wed 23:05]
+   These aren't running from the run_tests.py script for some reason.
+** TODO Try to fix doctests for Python 3.0
 * Misc
 ** DONE Convert project back to distutils
    CLOSED: [2011-11-05 Sat 01:30]
@@ -88,6 +92,7 @@
    Accept positional and keyword arguments to __init__ as arguments to the
    partial function.  This would require finding another way to specify
    copy_sig= and argv=.
-** TODO Rename printfn, ignore to reflect their operation on iterators
+** DONE Rename printfn, ignore to reflect their operation on iterators
+   CLOSED: [2011-11-09 Wed 02:39]
 ** TODO Consider alternate composition operators
    Perhaps use a pipe rather than rshift for forward composition?

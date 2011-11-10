@@ -26,12 +26,27 @@ of generator chaining described in David Beazley's PyCon 2008 presentation,
 Examples
 --------
 
-The :py:class:`~pointfree.pointfree` decorator lets you partially apply and
-compose functions, including generator functions.  Building upon an example
-from Beazley's presentation, suppose you have the following functions for
-operating on lines of text::
+The :py:mod:`pointfree` module is about using function composition in
+conjunction with partial application.  Both of these capabilities are
+achieved by wrapping functions in the :py:class:`~pointfree.pointfree`
+class (which can also be applied as a decorator).
+
+Several such helper functions are provided by the module.  For instance, if
+you wanted to define a function that returns the sum of squares of the
+lengths of the strings in a list, you could do so with the helpers
+:py:func:`~pointfree.pfmap` and :py:func:`~pointfree.pfreduce`::
 
     >>> from pointfree import *
+    >>> from operator import add
+    
+    >>> fn = pfreduce(add, initial=0) * pfmap(lambda n: n**2) * pfmap(len)
+    >>> fn(["foo", "barr", "bazzz"])
+    50
+
+You can make your own composable functions too, of course -- that's the
+whole point!  Building upon an example from Beazley's presentation, suppose
+you have defined the following functions for operating on lines of text::
+
     >>> import re
     
     >>> @pointfree
@@ -70,7 +85,7 @@ application and function composition operators::
     >>> f = gen_grep(r'(roses|violets|daffodils)') \
     ...     >> gen_upcase \
     ...     >> gen_repeat(2) \
-    ...     >> printfn
+    ...     >> pfprint_all
     
     >>> f(bad_poetry)
     ROSES ARE RED
