@@ -77,19 +77,12 @@ class partial(object):
 
     """
 
-    def __init__(self, f, argv={}, copy_sig=None):
+    def __init__(self, f, *pargs, **kargs):
         self.f = f
-        self.argv = argv.copy()
+        self.argv = {}
         self.__call_error = None
 
-        if copy_sig is not None:
-            self.pargl     = list(copy_sig.pargl)
-            self.kargl     = list(copy_sig.kargl)
-            self.def_argv  = copy_sig.def_argv.copy()
-            self.var_pargs = copy_sig.var_pargs
-            self.var_kargs = copy_sig.var_kargs
-
-        elif isinstance(f, classmethod) or isinstance(f, staticmethod):
+        if isinstance(f, classmethod) or isinstance(f, staticmethod):
             self.__call_error = "'%s' object is not callable" % type(f).__name__
 
         else:
@@ -126,16 +119,41 @@ class partial(object):
             if argspec[5] is not None:
                 self.def_argv.update(argspec[5])
 
-        self.__doc__    = f.__doc__    if hasattr(f, '__doc__')  else ''
-        self.__name__   = f.__name__   if hasattr(f, '__name__') else '<unnamed>'
+        self.__doc__  = f.__doc__  if hasattr(f, '__doc__')  else ''
+        self.__name__ = f.__name__ if hasattr(f, '__name__') else '<unnamed>'
+
+    @classmethod
+    def make_copy(klass, inst, f=None, argv=None, extra_argv=None, copy_sig=False):
+        """Makes a new instance of the partial application wrapper based on
+        an existing instance, optionally overriding the original's wrapped
+        function and/or saved arguments.
+
+        :param inst: The partial instance we're copying
+        :param f: Override the original's wrapped function
+        :param argv: Override saved argument values
+        :param extra_argv: Override saved extra positional arguments
+        :param copy_sig: Copy original's signature?
+        :rtype: New partial wrapper instance
+
+        """
+
+        dest               = klass(f or inst.f)
+        dest.argv          = (argv or inst.argv).copy()
+        #dest.extra_argv    = list(extra_argv if extra_argv else inst.extra_argv)
+
+        if copy_sig:
+            dest.pargl     = list(inst.pargl)
+            dest.kargl     = list(inst.kargl)
+            dest.def_argv  = inst.def_argv.copy()
+            dest.var_pargs = inst.var_pargs
+            dest.var_kargs = inst.var_kargs
+
+        return dest
 
     def __get__(self, inst, owner=None):
-        return self.__class__(self.f.__get__(inst, owner))
+        return self.make_copy(self, f=self.f.__get__(inst, owner))
 
-    def __call__(self, *new_pargs, **new_kargs):
-        if self.__call_error:
-            raise TypeError(self.__call_error)
-
+    def __new_argv(self, *new_pargs, **new_kargs):
         new_argv = self.argv.copy()
         extra_argv = []
 
@@ -161,6 +179,14 @@ class partial(object):
                                     % (self.__name__, k))
             new_argv[k] = v
 
+        return (new_argv, extra_argv)
+
+    def __call__(self, *new_pargs, **new_kargs):
+        if self.__call_error:
+            raise TypeError(self.__call_error)
+
+        new_argv, extra_argv = self.__new_argv(*new_pargs, **new_kargs)
+
         applic_argv = self.def_argv.copy()
         applic_argv.update(new_argv)
 
@@ -181,7 +207,7 @@ class partial(object):
             fkargs = dict((n,v) for n,v in new_argv.items() if not n in self.pargl)
             return self.f(*fpargs, **fkargs)
         else:
-            return self.__class__(self.f, argv=new_argv, copy_sig=self)
+            return self.make_copy(self, argv=new_argv, copy_sig=True)
 
 class pointfree(partial):
     """Decorator for function composition operators
@@ -193,10 +219,10 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        return self.__class__(lambda *p,**k: self(g.f(*p,**k)), argv=g.argv, copy_sig=g)
+        return self.make_copy(g, f=lambda *p,**k: self(g.f(*p,**k)), copy_sig=True)
 
     def __rshift__(self, g):
-        return self.__class__(lambda *p,**k: g(self.f(*p,**k)), argv=self.argv, copy_sig=self)
+        return self.make_copy(self, f=lambda *p,**k: g(self.f(*p,**k)), copy_sig=True)
 
 @pointfree
 def pfmap(func, iterable):

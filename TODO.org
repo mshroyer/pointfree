@@ -96,3 +96,4 @@
    CLOSED: [2011-11-09 Wed 02:39]
 ** TODO Consider alternate composition operators
    Perhaps use a pipe rather than rshift for forward composition?
+** TODO Rename partial.f to partial.func
