@@ -77,13 +77,13 @@ class partial(object):
 
     """
 
-    def __init__(self, f, *pargs, **kargs):
-        self.f = f
+    def __init__(self, func, *pargs, **kargs):
+        self.func = func
         self.argv = {}
         self.__call_error = None
 
-        if isinstance(f, classmethod) or isinstance(f, staticmethod):
-            self.__call_error = "'%s' object is not callable" % type(f).__name__
+        if isinstance(func, classmethod) or isinstance(func, staticmethod):
+            self.__call_error = "'%s' object is not callable" % type(func).__name__
 
         else:
             # Extract function signature, default arguments, keyword-only
@@ -94,14 +94,14 @@ class partial(object):
             # objects are not callable, so we do not attempt to support
             # them here.
 
-            if isinstance(f, types.MethodType):
+            if isinstance(func, types.MethodType):
                 # A bound instance or class method.
-                argspec = getfullargspec(f.__func__)
+                argspec = getfullargspec(func.__func__)
                 self.pargl = argspec[0][1:]
             else:
                 # A regular function, an unbound instance method, or a
                 # bound static method.
-                argspec = getfullargspec(f)
+                argspec = getfullargspec(func)
                 self.pargl = argspec[0][:]
 
             if argspec[3] is not None:
@@ -119,17 +119,17 @@ class partial(object):
             if argspec[5] is not None:
                 self.def_argv.update(argspec[5])
 
-        self.__doc__  = f.__doc__  if hasattr(f, '__doc__')  else ''
-        self.__name__ = f.__name__ if hasattr(f, '__name__') else '<unnamed>'
+        self.__doc__  = func.__doc__  if hasattr(func, '__doc__')  else ''
+        self.__name__ = func.__name__ if hasattr(func, '__name__') else '<unnamed>'
 
     @classmethod
-    def make_copy(klass, inst, f=None, argv=None, extra_argv=None, copy_sig=True):
+    def make_copy(klass, inst, func=None, argv=None, extra_argv=None, copy_sig=True):
         """Makes a new instance of the partial application wrapper based on
         an existing instance, optionally overriding the original's wrapped
         function and/or saved arguments.
 
         :param inst: The partial instance we're copying
-        :param f: Override the original's wrapped function
+        :param func: Override the original's wrapped function
         :param argv: Override saved argument values
         :param extra_argv: Override saved extra positional arguments
         :param copy_sig: Copy original's signature?
@@ -137,7 +137,7 @@ class partial(object):
 
         """
 
-        dest               = klass(f or inst.f)
+        dest               = klass(func or inst.func)
         dest.argv          = (argv or inst.argv).copy()
         #dest.extra_argv    = list(extra_argv if extra_argv else inst.extra_argv)
 
@@ -151,7 +151,7 @@ class partial(object):
         return dest
 
     def __get__(self, inst, owner=None):
-        return self.make_copy(self, f=self.f.__get__(inst, owner), copy_sig=False)
+        return self.make_copy(self, func=self.func.__get__(inst, owner), copy_sig=False)
 
     def __new_argv(self, *new_pargs, **new_kargs):
         new_argv = self.argv.copy()
@@ -205,7 +205,7 @@ class partial(object):
         if applic_ready:
             fpargs = [new_argv[n] for n in self.pargl if n in new_argv] + extra_argv
             fkargs = dict((n,v) for n,v in new_argv.items() if not n in self.pargl)
-            return self.f(*fpargs, **fkargs)
+            return self.func(*fpargs, **fkargs)
         else:
             return self.make_copy(self, argv=new_argv)
 
@@ -219,10 +219,10 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        return self.make_copy(g, f=lambda *p,**k: self(g.f(*p,**k)))
+        return self.make_copy(g, func=lambda *p,**k: self(g.func(*p,**k)))
 
     def __rshift__(self, g):
-        return self.make_copy(self, f=lambda *p,**k: g(self.f(*p,**k)))
+        return self.make_copy(self, func=lambda *p,**k: g(self.func(*p,**k)))
 
 @pointfree
 def pfmap(func, iterable):
