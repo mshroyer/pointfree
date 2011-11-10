@@ -42,7 +42,7 @@ __all__ = [
     'pfignore_all',
     ]
 
-import sys, inspect, types, itertools
+import sys, inspect, types, itertools, functools
 
 # No getfullargspec in Python 2, since there are no keyword-only arguments.
 if hasattr(inspect, 'getfullargspec'):
@@ -80,47 +80,72 @@ class partial(object):
     def __init__(self, func, *pargs, **kargs):
         self.func = func
         self.argv = {}
+        self.extra_argv = []
         self.__call_error = None
+
+        if isinstance(func, partial):
+            self.func = func.func
+            inst = func
+            self.argv = inst.argv
+            self.extra_argv = inst.extra_argv
+            self.__sig_from_partial(inst)
+
+        if isinstance(func, functools.partial):
+            self.func = func.func
+            self.__sig_from_func(self.func)
+            self.__update_argv(*func.args, **func.keywords)
 
         if isinstance(func, classmethod) or isinstance(func, staticmethod):
             self.__call_error = "'%s' object is not callable" % type(func).__name__
 
         else:
-            # Extract function signature, default arguments, keyword-only
-            # arguments, and whether or not variable positional or keyword
-            # arguments are allowed.  This also supports calling unbound
-            # instance methods by passing an object instance as the first
-            # argument; however, unbound classmethod and staticmethod
-            # objects are not callable, so we do not attempt to support
-            # them here.
+            self.__sig_from_func(func)
 
-            if isinstance(func, types.MethodType):
-                # A bound instance or class method.
-                argspec = getfullargspec(func.__func__)
-                self.pargl = argspec[0][1:]
-            else:
-                # A regular function, an unbound instance method, or a
-                # bound static method.
-                argspec = getfullargspec(func)
-                self.pargl = argspec[0][:]
-
-            if argspec[3] is not None:
-                def_offset = len(self.pargl) - len(argspec[3])
-                self.def_argv = dict((self.pargl[def_offset+i],argspec[3][i]) \
-                                         for i in range(len(argspec[3])))
-            else:
-                self.def_argv = {}
-
-            self.var_pargs = argspec[1] is not None
-            self.var_kargs = argspec[2] is not None
-            self.kargl     = argspec[4]
-
-            # We need keyword-only arguments' default values too.
-            if argspec[5] is not None:
-                self.def_argv.update(argspec[5])
+        self.__update_argv(*pargs, **kargs)
 
         self.__doc__  = func.__doc__  if hasattr(func, '__doc__')  else ''
         self.__name__ = func.__name__ if hasattr(func, '__name__') else '<unnamed>'
+
+    def __sig_from_func(self, func):
+        # Extract function signature, default arguments, keyword-only
+        # arguments, and whether or not variable positional or keyword
+        # arguments are allowed.  This also supports calling unbound
+        # instance methods by passing an object instance as the first
+        # argument; however, unbound classmethod and staticmethod
+        # objects are not callable, so we do not attempt to support
+        # them here.
+
+        if isinstance(func, types.MethodType):
+            # A bound instance or class method.
+            argspec = getfullargspec(func.__func__)
+            self.pargl = argspec[0][1:]
+        else:
+            # A regular function, an unbound instance method, or a
+            # bound static method.
+            argspec = getfullargspec(func)
+            self.pargl = argspec[0][:]
+
+        if argspec[3] is not None:
+            def_offset = len(self.pargl) - len(argspec[3])
+            self.def_argv = dict((self.pargl[def_offset+i],argspec[3][i]) \
+                                     for i in range(len(argspec[3])))
+        else:
+            self.def_argv = {}
+
+        self.var_pargs = argspec[1] is not None
+        self.var_kargs = argspec[2] is not None
+        self.kargl     = argspec[4]
+
+        # We need keyword-only arguments' default values too.
+        if argspec[5] is not None:
+            self.def_argv.update(argspec[5])
+
+    def __sig_from_partial(self, inst):
+        self.pargl     = list(inst.pargl)
+        self.kargl     = list(inst.kargl)
+        self.def_argv  = inst.def_argv.copy()
+        self.var_pargs = inst.var_pargs
+        self.var_kargs = inst.var_kargs
 
     @classmethod
     def make_copy(klass, inst, func=None, argv=None, extra_argv=None, copy_sig=True):
@@ -142,11 +167,7 @@ class partial(object):
         #dest.extra_argv    = list(extra_argv if extra_argv else inst.extra_argv)
 
         if copy_sig:
-            dest.pargl     = list(inst.pargl)
-            dest.kargl     = list(inst.kargl)
-            dest.def_argv  = inst.def_argv.copy()
-            dest.var_pargs = inst.var_pargs
-            dest.var_kargs = inst.var_kargs
+            dest.__sig_from_partial(inst)
 
         return dest
 
@@ -180,6 +201,9 @@ class partial(object):
             new_argv[k] = v
 
         return (new_argv, extra_argv)
+
+    def __update_argv(self, *pargs, **kargs):
+        self.argv, self.extra_argv = self.__new_argv(*pargs, **kargs)
 
     def __call__(self, *new_pargs, **new_kargs):
         if self.__call_error:
