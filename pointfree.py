@@ -123,7 +123,7 @@ class partial(object):
         self.__name__ = f.__name__ if hasattr(f, '__name__') else '<unnamed>'
 
     @classmethod
-    def make_copy(klass, inst, f=None, argv=None, extra_argv=None, copy_sig=False):
+    def make_copy(klass, inst, f=None, argv=None, extra_argv=None, copy_sig=True):
         """Makes a new instance of the partial application wrapper based on
         an existing instance, optionally overriding the original's wrapped
         function and/or saved arguments.
@@ -151,7 +151,7 @@ class partial(object):
         return dest
 
     def __get__(self, inst, owner=None):
-        return self.make_copy(self, f=self.f.__get__(inst, owner))
+        return self.make_copy(self, f=self.f.__get__(inst, owner), copy_sig=False)
 
     def __new_argv(self, *new_pargs, **new_kargs):
         new_argv = self.argv.copy()
@@ -207,7 +207,7 @@ class partial(object):
             fkargs = dict((n,v) for n,v in new_argv.items() if not n in self.pargl)
             return self.f(*fpargs, **fkargs)
         else:
-            return self.make_copy(self, argv=new_argv, copy_sig=True)
+            return self.make_copy(self, argv=new_argv)
 
 class pointfree(partial):
     """Decorator for function composition operators
@@ -219,10 +219,10 @@ class pointfree(partial):
     """
 
     def __mul__(self, g):
-        return self.make_copy(g, f=lambda *p,**k: self(g.f(*p,**k)), copy_sig=True)
+        return self.make_copy(g, f=lambda *p,**k: self(g.f(*p,**k)))
 
     def __rshift__(self, g):
-        return self.make_copy(self, f=lambda *p,**k: g(self.f(*p,**k)), copy_sig=True)
+        return self.make_copy(self, f=lambda *p,**k: g(self.f(*p,**k)))
 
 @pointfree
 def pfmap(func, iterable):
