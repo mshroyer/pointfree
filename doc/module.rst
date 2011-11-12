@@ -14,3 +14,7 @@ Composable helper functions
 .. autofunction:: pfreduce(func, iterable[, initial=None])
 
 .. autofunction:: pfcollect(iterable[, n=None])
+
+.. autofunction:: pfprint_all(iterable)
+
+.. autofunction:: pfignore_all(iterable)

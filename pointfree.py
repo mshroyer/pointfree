@@ -349,17 +349,63 @@ def pfcollect(iterable, n=None):
         return list(iterable)
 
 @pointfree
-def pfprint_all(iterator):
-    """Pointfree function to print all items from an iterator
+def pfprint_all(iterable):
+    """Prints each item from an iterable.
 
-    A helper function to 
+    :param iterable: An iterable yielding values to print
+    :rtype: None
+
+    Example::
+
+        >>> @pointfree
+        ... def prefix_all(prefix, iterable):
+        ...     for item in iterable:
+        ...         yield "%s%s" % (prefix, item)
+
+        >>> fn = prefix_all("An item: ") >> pfprint_all
+
+        >>> fn(["foo", "bar", "baz"])
+        An item: foo
+        An item: bar
+        An item: baz
 
     """
 
-    for item in iterator:
+    for item in iterable:
         print(item)
 
 @pointfree
 def pfignore_all(iterator):
+    """Consumes all the items from an iterable, discarding their output.
+    This may be useful if evaluating the iterable produces some desirable
+    side-effect, but you have no need to collect its output.
+
+    :param iterable: An iterable
+    :rtype: None
+
+    Example::
+
+        >>> result = []
+
+        >>> @pointfree
+        ... def append_all(collector, iterable):
+        ...     for item in iterable:
+        ...         collector.append(item)
+        ...         yield item
+
+        >>> @pointfree
+        ... def square_all(iterable):
+        ...     for item in iterable:
+        ...         yield item**2
+
+        >>> fn = square_all \\
+        ...      >> append_all(result) \\
+        ...      >> pfignore_all
+        >>> fn([1, 2, 3, 4])
+        >>> result
+        [1, 4, 9, 16]
+
+    """
+
     for item in iterator:
         pass
