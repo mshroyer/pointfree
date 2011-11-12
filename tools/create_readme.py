@@ -64,16 +64,4 @@ if __name__ == '__main__':
 
     reader = RstReader(join(project_root, "doc", "overview.rst"))
     with open(join(project_root, "README.rst"), "w") as out_file:
-        print_sections(reader, out_file, set(["Introduction"]))
-
-        print("""``pointfree``'s full documentation can be found on the web at:
-
-http://pointfree.rtfd.org/
-
-For the latest version of the module, visit its Github page:
-
-https://github.com/markshroyer/pointfree/
-
-""", file=out_file)
-        
-        print_sections(reader, out_file, set(["Examples"]))
+        print_sections(reader, out_file, set(["Introduction", "Getting the module", "Examples"]))

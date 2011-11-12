@@ -23,6 +23,20 @@ of generator chaining described in David Beazley's PyCon 2008 presentation,
 <http://www.dabeaz.com/generators/Generators.pdf>`_.
 
 
+Getting the module
+------------------
+
+For the latest version of the :py:mod:`pointfree`, visit its Github page:
+
+https://github.com/markshroyer/pointfree
+
+Documentation is hosted on `Read the Docs`_:
+
+http://pointfree.rtfd.org/
+
+.. _`Read the Docs`: http://www.readthedocs.org/
+
+
 Examples
 --------
 
