@@ -6,14 +6,14 @@
 Pointfree Documentation
 =======================
 
-pointfree is a small module that makes certain functional programming
-constructs more convenient to use in Python.
+:py:mod:`pointfree` is a small module that makes certain functional
+programming constructs more convenient to use in Python.
 
 .. toctree::
    :maxdepth: 2
 
    overview
-   api
+   module
    faq
    license
 

@@ -1,5 +1,5 @@
-API reference
-=============
+Module reference
+================
 
 .. automodule:: pointfree
 
