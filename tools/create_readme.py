@@ -6,6 +6,8 @@
 # Mark Shroyer
 # Tue Nov  8 22:14:45 EST 2011
 
+from __future__ import print_function
+
 import re
 from os.path import realpath, dirname, join
 
@@ -52,11 +54,29 @@ class RstReader(object):
 
             section.add_line(line)
 
+def print_sections(reader, dest, section_names):
+    for section in reader.sections:
+        if section.name in section_names:
+            print(section.get_text(), file=dest)
+
 if __name__ == '__main__':
     project_root = realpath(join(dirname(__file__), '..'))
 
     reader = RstReader(join(project_root, "doc", "overview.rst"))
     with open(join(project_root, "README.rst"), "w") as out_file:
-        for section in reader.sections:
-            if section.name in set(["Introduction", "Examples"]):
-                print >> out_file, section.get_text()
+        print_sections(reader, out_file, set(["Introduction"]))
+
+        print("""Getting Pointfree
+-----------------
+
+``pointfree``'s full documentation can be found on the web at:
+
+http://pointfree.rtfd.org/
+
+For the latest version of the module, visit its Github page:
+
+https://github.com/markshroyer/pointfree/
+
+""", file=out_file)
+        
+        print_sections(reader, out_file, set(["Examples"]))
