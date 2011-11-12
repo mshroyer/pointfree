@@ -136,7 +136,7 @@ instead::
 
 The module's partial application support has some subtle intentional
 differences from normal Python function application rules.  Please see the
-:ref:`module reference <module_reference>` for details.
+module reference for details.
 
 
 Getting the module
