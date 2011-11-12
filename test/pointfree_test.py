@@ -279,6 +279,9 @@ class PartialUnboundMethodsCase(TestCase):
 def just_add(a, b, c):
     return a + b + c
 
+def just_add2(a, b, *args):
+    return a + b + sum(args)
+
 ### __INIT__ ARGUMENT TESTS ###############################################
 
 class ArgsToInitCase(TestCase):
@@ -298,6 +301,20 @@ class ArgsToInitCase(TestCase):
         # And when we call this object with no arguments, the function
         # should be evaluated.
         self.assertEqual(p(), 6)
+
+class ExtraArgsToInitCase(TestCase):
+    """Make sure partial behaves as expected when extra arguments are
+    provided to the __init__ method."""
+
+    def testExtraArgsToInit(self):
+        p = partial(just_add2, 1, 2, 3, 4, 5)
+        self.assertIsInstance(p, partial)
+        self.assertEqual(p(), 15)
+        self.assertEqual(p(6, 7), 28)
+
+    def testTooManyArgsToInit(self):
+        self.assertRaises(TypeError, lambda: partial(just_add, 1, 2, 3, 4))
+        self.assertRaises(TypeError, lambda: partial(just_add, d=4))
 
 class FunctoolsPartialCase(TestCase):
     """Make sure pointfree.partial can accept a functools.partial as an
