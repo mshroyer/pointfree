@@ -2,6 +2,8 @@
 
 from __future__ import print_function
 
+DOCTEST_FILENAMES = set(["overview.rst", "module.rst", "faq.rst"])
+
 import sys, unittest, doctest, inspect
 from os.path import realpath, join, dirname
 
@@ -91,9 +93,8 @@ if __name__ == '__main__':
         return doctest.DocFileSuite(join(project_path, "doc", filename), module_relative=False)
 
     doctest_suite = unittest.TestSuite()
-    doctest_suite.addTest(make_docfilesuite("overview.rst"))
-    doctest_suite.addTest(make_docfilesuite("api.rst"))
-    doctest_suite.addTest(make_docfilesuite("faq.rst"))
+    for filename in DOCTEST_FILENAMES:
+        doctest_suite.addTest(make_docfilesuite(filename))
     doctest_suite.addTest(doctest.DocTestSuite(pointfree, test_finder=PFDocTestFinder()))
 
     test_runner = unittest.TextTestRunner(verbosity=1)
