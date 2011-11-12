@@ -1,4 +1,4 @@
-import os, sys, unittest, types
+import os, sys, unittest, types, functools
 from pointfree import *
 
 # The unittest.TestCase in Python 2.6 and 3.0 doesn't have some of the
@@ -298,6 +298,19 @@ class ArgsToInitCase(TestCase):
         # And when we call this object with no arguments, the function
         # should be evaluated.
         self.assertEqual(p(), 6)
+
+class FunctoolsPartialCase(TestCase):
+    """Make sure pointfree.partial can accept a functools.partial as an
+    argument (though this won't work if the functools.partial instance
+    wraps a builtin Python function."""
+
+    def testFunctoolsPartialInit(self):
+        self.assertEqual(partial(functools.partial(just_add))(1, 2, 3), 6)
+        self.assertEqual(partial(functools.partial(just_add, 1, 2))(3), 6)
+        self.assertEqual(partial(functools.partial(just_add, 1, 2, 3))(), 6)
+
+    def testEarlyError(self):
+        self.assertRaises(TypeError, lambda: partial(functools.partial(just_add, 1, 2, 3, 4)))
 
 ### POINTFREE OPERATOR FIXTURES ###########################################
 

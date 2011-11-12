@@ -96,12 +96,14 @@ class partial(object):
             self.extra_argv = inst.extra_argv
             self.__sig_from_partial(inst)
 
-        if isinstance(func, functools.partial):
+        elif isinstance(func, functools.partial):
             self.func = func.func
             self.__sig_from_func(self.func)
-            self.__update_argv(*func.args, **func.keywords)
+            partial_args = func.args or ()
+            partial_keywords = func.keywords or {}
+            self.__update_argv(*partial_args, **partial_keywords)
 
-        if isinstance(func, classmethod) or isinstance(func, staticmethod):
+        elif isinstance(func, classmethod) or isinstance(func, staticmethod):
             self.__call_error = "'%s' object is not callable" % type(func).__name__
 
         else:
