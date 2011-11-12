@@ -36,6 +36,7 @@ __version__ = 0.1
 __all__ = [
     'partial',
     'pointfree',
+    'pf',
     'pfmap',
     'pfreduce',
     'pfprint_all',
@@ -252,6 +253,9 @@ class pointfree(partial):
 
     def __rshift__(self, g):
         return self.make_copy(self, func=lambda *p,**k: g(self.func(*p,**k)))
+
+# Shorthand pointfree notation
+pf = pointfree
 
 @pointfree
 def pfmap(func, iterable):

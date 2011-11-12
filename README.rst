@@ -11,18 +11,20 @@ Specifically, it provides:
 * Notations for function composition through operator overloading.
 * Helper functions to make composing generators more elegant.
 
-The objective is to support the `pointfree programming style
-<http://www.haskell.org/haskellwiki/Pointfree>`_ in a lightweight and easy
-to use manner -- and in particular, to serve as a nice syntax for the kind
-of generator chaining described in David Beazley's PyCon 2008 presentation,
-`"Generator Tricks for Systems Programmers"
-<http://www.dabeaz.com/generators/Generators.pdf>`_.
+The objective is to support the `pointfree programming style`_ in a
+lightweight and easy to use manner -- and in particular, to serve as a nice
+syntax for the kind of generator pipelines described in David Beazley's
+PyCon 2008 presentation, `"Generator Tricks for Systems Programmers"`_.
+
+.. _`pointfree programming style`: http://www.haskell.org/haskellwiki/Pointfree
+
+.. _`"Generator Tricks for Systems Programmers"`: http://www.dabeaz.com/generators/Generators.pdf
 
 
 Getting the module
 ------------------
 
-For the latest version of the ``pointfree``, visit its Github page:
+For the latest version of ``pointfree``, visit its Github page:
 
 https://github.com/markshroyer/pointfree
 
@@ -36,26 +38,28 @@ http://pointfree.rtfd.org/
 Examples
 --------
 
-The ``pointfree`` module is about using function composition in
-conjunction with partial application.  Both of these capabilities are
-achieved by wrapping functions in the ``pointfree``
+The ``pointfree`` module is about using function composition notation
+in conjunction with automatic partial application.  Both of these features
+are achieved by wrapping functions in the ``pointfree``
 class (which can also be applied as a decorator).
 
-Several such helper functions are provided by the module.  For instance, if
-you wanted to define a function that returns the sum of squares of the
-lengths of the strings in a list, you could do so with the helpers
-``pfmap`` and ``pfreduce``::
+Several "pre-wrapped" helper functions are provided by the module.  For
+instance, if you wanted to define a function that returns the sum of
+squares of the lengths of the strings in a list, you could do so by
+combining the helpers ``pfmap`` and
+``pfreduce``::
 
     >>> from pointfree import *
     >>> from operator import add
     
-    >>> fn = pfreduce(add, initial=0) * pfmap(lambda n: n**2) * pfmap(len)
+    >>> fn = pfmap(len) >> pfmap(lambda n: n**2) >> pfreduce(add, initial=0)
     >>> fn(["foo", "barr", "bazzz"])
     50
 
-You can make your own composable functions too, of course -- that's the
-whole point!  Building upon an example from Beazley's presentation, suppose
-you have defined the following functions for operating on lines of text::
+Aside from the built-in helpers, you can define your own composable
+functions by applying ``pointfree`` as a decorator.
+Building upon an example from Beazley's presentation, suppose you have
+defined the following functions for operating on lines of text::
 
     >>> import re
     
@@ -87,10 +91,11 @@ And you have some text too::
     ... um let's see...
     ... oh yeah and daffodils are flowers too""".split("\n")
 
-Now suppose you want to find just the lines of your text that contain the
-name of a flower and print them, twice, in upper case.  The given functions
-can be combined to do so as follows, using pointfree's automatic partial
-application and function composition operators::
+Now say you want to find just the lines of your text that contain the name
+of a flower and print them, twice, in upper case.  (A common problem, I'm
+sure.)  The given functions can be combined to do so as follows, using
+``pointfree``'s automatic partial application and its
+function composition operators::
 
     >>> f = gen_grep(r'(roses|violets|daffodils)') \
     ...     >> gen_upcase \
@@ -107,7 +112,8 @@ application and function composition operators::
 
 In addition to the ``>>`` operator for "forward" composition, functions can
 also be composed with the ``*`` operator.  (This is intended to be
-remniscent of the circle operator "∘" from algebra.)::
+remniscent of the circle operator "∘" from algebra, or the corresponding
+dot operator in Haskell.)::
 
     >>> @pointfree
     ... def f(x):
@@ -121,16 +127,19 @@ remniscent of the circle operator "∘" from algebra.)::
     >>> h(2)
     9
 
-And of course you don't have to define your methods using decorator
-notation in order to use ``pointfree``; you can directly
-instantiate the class from an existing function or method::
+Of course you don't have to define your methods using decorator notation in
+order to use ``pointfree``; you can directly instantiate
+the class from an existing function or method::
 
-    >>> (pointfree(lambda x: x*2) * pointfree(lambda x: x+1))(3)
+    >>> (pf(lambda x: x*2) * pf(lambda x: x+1))(3)
     8
 
-If you want to use automatic partial application but not the composition
-operators, you can use the module's ``partial``
-decorator instead::
+(``pf`` is provided as a shorthand alias for the
+``pointfree`` class.)
+
+If you want ``pointfree``'s automatic partial
+application but not the composition operators, use the module's
+``partial`` decorator instead::
 
     >>> @partial
     ... def add_three(a, b, c):
@@ -139,9 +148,6 @@ decorator instead::
     >>> add_three(1)(2)(3)
     6
 
-(Using the ``pointfree`` decorator imbues a superset of
-the capabilities provided by ``partial``.)
-
-pointfree's partial application support has some intentional differences
-from normal Python function application semantics.  Please refer to the API
-reference for details.
+The module's partial application support has some subtle intentional
+differences from normal Python function application rules.  Please refer to
+the :ref:`module reference <module_reference>` for details.
