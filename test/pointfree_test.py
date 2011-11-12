@@ -274,6 +274,31 @@ class PartialUnboundMethodsCase(TestCase):
     def testInstanceMethodPartialApplication(self):
         self.assertEqual(self.instance_padd(self.inst)(1,2)(3), 16)
 
+### __INIT__ ARGUMENT FIXTURES ############################################
+
+def just_add(a, b, c):
+    return a + b + c
+
+### __INIT__ ARGUMENT TESTS ###############################################
+
+class ArgsToInitCase(TestCase):
+    def testArgumentsToInit(self):
+        self.assertEqual(partial(just_add)(1, 2, 3), 6)
+        self.assertEqual(partial(just_add, 1, 2)(3), 6)
+        self.assertEqual(partial(just_add, 1)(2)(3), 6)
+
+    def testFullArguments(self):
+        p = partial(just_add, 1, 2, 3)
+
+        # partial(just_add, 1, 2, 3) should still be a partial instance,
+        # even though we've specified enough arguments that the function
+        # can be fully applied.
+        self.assertIsInstance(p, partial)
+
+        # And when we call this object with no arguments, the function
+        # should be evaluated.
+        self.assertEqual(p(), 6)
+
 ### POINTFREE OPERATOR FIXTURES ###########################################
 
 @pointfree
