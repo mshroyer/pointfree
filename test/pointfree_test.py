@@ -1,4 +1,4 @@
-import os, sys, unittest, types, functools
+import os, sys, unittest, types, functools, operator
 from pointfree import *
 
 # The unittest.TestCase in Python 2.6 and 3.0 doesn't have some of the
@@ -484,6 +484,46 @@ class PointfreeStaticMethodCase(TestCase):
         self.assertEqual(f(1,2,3), 47)
         self.assertEqual(f(1)(2)(3), 47)
         self.assertEqual(f(c=3)(1)(2), 47)
+
+### HELPER FUNCTION TESTS #################################################
+
+class HelperPfmapCase(TestCase):
+    def testPfmap(self):
+        fn = pfmap(lambda x: x+1)
+        self.assertEqual(list(fn(range(5))), [1, 2, 3, 4, 5])
+
+class HelperPfreduceCase(TestCase):
+    def testPfreduce(self):
+        fn = pfmap(lambda x: x+1) >> pfreduce(operator.add, initial=0)
+        self.assertEqual(fn(range(5)), 15)
+
+    def testPfreduceInitial(self):
+        fn = pfreduce(operator.add, initial=2)
+        self.assertEqual(fn([]), 2)
+        self.assertEqual(fn([1,2]), 5)
+
+    def testPfreduceNoInitial(self):
+        fn = pfreduce(operator.add)
+        self.assertIsNone(fn([]))
+
+class HelperPfcollectCase(TestCase):
+    def testPfcollect(self):
+        fn = pf(lambda: range(5)) >> pfcollect
+        self.assertEqual(fn(), [0, 1, 2, 3, 4])
+
+class HelperPfignoreCase(TestCase):
+    def testPfignore(self):
+        result = []
+
+        @pointfree
+        def fn(iterator):
+            for item in iterator:
+                result.append(item)
+                yield item
+
+        (fn >> pfignore_all)(range(3))
+        self.assertEqual(result, [0, 1, 2])
+        
 
 ### PYTHON 3 KEYWORD-ONLY ARGS TESTS ######################################
 
