@@ -7,7 +7,8 @@ Pointfree Documentation
 =======================
 
 :py:mod:`pointfree` is a small module that makes certain functional
-programming constructs more convenient to use in Python.
+programming constructs more convenient to use in Python.  This is its
+documentation.
 
 .. toctree::
    :maxdepth: 2

@@ -21,20 +21,6 @@ PyCon 2008 presentation, `"Generator Tricks for Systems Programmers"`_.
 .. _`"Generator Tricks for Systems Programmers"`: http://www.dabeaz.com/generators/Generators.pdf
 
 
-Getting the module
-------------------
-
-For the latest version of ``pointfree``, visit its Github page:
-
-https://github.com/markshroyer/pointfree
-
-Documentation is hosted on `Read the Docs`_:
-
-http://pointfree.rtfd.org/
-
-.. _`Read the Docs`: http://www.readthedocs.org/
-
-
 Examples
 --------
 
@@ -137,9 +123,9 @@ the class from an existing function or method::
 (``pf`` is provided as a shorthand alias for the
 ``pointfree`` class.)
 
-If you want ``pointfree``'s automatic partial
-application but not the composition operators, use the module's
-``partial`` decorator instead::
+If you want automatic partial application but not the composition
+operators, use the module's ``partial`` decorator
+instead::
 
     >>> @partial
     ... def add_three(a, b, c):
@@ -149,5 +135,31 @@ application but not the composition operators, use the module's
     6
 
 The module's partial application support has some subtle intentional
-differences from normal Python function application rules.  Please refer to
-the :ref:`module reference <module_reference>` for details.
+differences from normal Python function application rules.  Please see the
+:ref:`module reference <module_reference>` for details.
+
+
+Getting the module
+------------------
+
+For the latest version of ``pointfree``, visit its Github page:
+
+https://github.com/markshroyer/pointfree
+
+Documentation is hosted on `Read the Docs`_:
+
+http://pointfree.rtfd.org/
+
+.. _`Read the Docs`: http://www.readthedocs.org/
+
+``pointfree`` works on the following Python implementations:
+
+* CPython 2.6, 2.7, 3.0, 3.1, and 3.2
+
+* PyPy 1.6.0
+
+* IronPython 2.7.1
+
+`PEP 3102`_ keyword-only arguments are fully supported on Python 3.
+
+.. _`PEP 3102`: http://www.python.org/dev/peps/pep-3102/
