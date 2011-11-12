@@ -312,6 +312,16 @@ class FunctoolsPartialCase(TestCase):
     def testEarlyError(self):
         self.assertRaises(TypeError, lambda: partial(functools.partial(just_add, 1, 2, 3, 4)))
 
+class PointfreePartialCase(TestCase):
+    """Make sure partial can accept one of its own instances as an
+    argument."""
+
+    def testPartialPartial(self):
+        self.assertEqual(partial(partial(just_add))(1, 2, 3), 6)
+        self.assertEqual(partial(partial(just_add, 1, 2), 3)(), 6)
+        self.assertEqual(partial(partial(just_add), 1)(2)(3), 6)
+        self.assertEqual(partial(partial(just_add, 1)(2))(3), 6)
+
 ### POINTFREE OPERATOR FIXTURES ###########################################
 
 @pointfree
