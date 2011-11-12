@@ -169,7 +169,7 @@ class partial(object):
 
         dest               = klass(func or inst.func)
         dest.argv          = (argv or inst.argv).copy()
-        #dest.extra_argv    = list(extra_argv if extra_argv else inst.extra_argv)
+        dest.extra_argv    = list(extra_argv if extra_argv else inst.extra_argv)
 
         if copy_sig:
             dest.__sig_from_partial(inst)
