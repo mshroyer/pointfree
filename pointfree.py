@@ -39,6 +39,7 @@ __all__ = [
     'pf',
     'pfmap',
     'pfreduce',
+    'pfcollect',
     'pfprint_all',
     'pfignore_all',
     ]
