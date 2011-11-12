@@ -66,10 +66,7 @@ if __name__ == '__main__':
     with open(join(project_root, "README.rst"), "w") as out_file:
         print_sections(reader, out_file, set(["Introduction"]))
 
-        print("""Getting Pointfree
------------------
-
-``pointfree``'s full documentation can be found on the web at:
+        print("""``pointfree``'s full documentation can be found on the web at:
 
 http://pointfree.rtfd.org/
 
