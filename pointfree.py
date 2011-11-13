@@ -278,6 +278,9 @@ class partial(object):
     The wrapper can also be instantiated from another
     :py:class:`~pointfree.partial` instance::
 
+        >>> def foo8(a, b, c, *args):
+        ...     return a + b + c + sum(args)
+
         >>> p = partial(foo8, 1)
         >>> q = partial(p, 2)
         >>> q(3)
@@ -297,9 +300,6 @@ class partial(object):
     While you will probably apply :py:class:`~pointfree.partial` as a
     decorator when defining your own functions, you can also wrap existing
     functions by instantiating the class directly::
-
-        >>> def foo8(a, b, c, *args):
-        ...     return a + b + c + sum(args)
 
         >>> partial(foo8)(1)(2)(3)
         6
@@ -491,11 +491,59 @@ class partial(object):
             return self.make_copy(self, argv=new_argv)
 
 class pointfree(partial):
-    """Decorator for function composition operators
+    """Wraps a regular Python function or method into a callable object
+    supporting the ``>>`` and ``*`` function composition operators, as well
+    as automatic partial application.
 
-    Converts a Python function or method into one supporting composition
-    via the * and >> operators.  Pointfree objects also support automatic
-    partial application (see the partial class, above).
+    :param func: Function or method to wrap
+    :param pargs: Optional, positional arguments for the wrapped function
+    :param kargs: Optional, keyword arguments for the wrapped function
+
+    This class inherits its partial application behavior from
+    :py:class:`~pointfree.partial`; refer to its documentation on partial
+    application behavior.
+
+    On top of partial application, the :py:class:`~pointfree.pointfree`
+    wrapper adds two function composition operators, ``>>`` and ``*``, for
+    "forward" and "reverse" function composition respectively.  For
+    example, given the following wrapped functions::
+
+        >>> @pointfree
+        ... def pfadd(a, b):
+        ...     return a + b
+
+        >>> @pointfree
+        ... def pfmul(a, b):
+        ...     return a * b
+
+    The following forward composition defines the function ``f()`` as one
+    which takes a given number, adds one to it, and then multiplies the
+    result of the addition by two::
+
+        >>> f = pfadd(1) >> pfmul(2)
+        >>> f(1)
+        4
+
+    Reverse composition simply works in the opposite direction.  In this
+    example, ``g()`` takes a number, multiplies it by three, and then adds
+    four::
+
+        >>> g = pfadd(4) * pfmul(3)
+        >>> g(5)
+        19
+
+    The alias ``pf`` is provided for :py:class:`~pointfree.pointfree` to
+    conserve electrons when wrapping functions inline::
+
+        >>> def add(a, b):
+        ...     return a + b
+
+        >>> def mul(a, b):
+        ...     return a * b
+
+        >>> f = pf(add, 1) >> pf(mul, 2)
+        >>> f(2)
+        6
 
     """
 
