@@ -6,6 +6,16 @@ Module reference
 .. automodule:: pointfree
 
 
+Wrapper classes
+---------------
+
+.. autoclass:: partial
+
+.. autoclass:: pointfree
+
+
+.. _helper_functions:
+
 Composable helper functions
 ---------------------------
 

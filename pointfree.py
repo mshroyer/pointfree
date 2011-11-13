@@ -1,15 +1,12 @@
 """
-python-pointfree: Pointfree style support for Python
+:py:mod:`pointfree` -- Pythonic pointfree programming.
 
-https://github.com/markshroyer/python-pointfree
+* Full documentation: http://pointfree.rtfd.org/
+* Project page: https://github.com/markshroyer/pointfree
 
-Pointfree provides support for the point-free programming style in Python.
-It works in CPython versions 2.6, 2.7, 3.0, 3.1, and 3.2, as well as PyPy
-1.6.0 and IronPython 2.7.1.  In Python 3, keyword-only arguments are fully
-supported.
 
-See the documentation for the partial and pointfree classes, below, for
-details on usage.
+Copyright notice
+----------------
 
 Copyright 2011 Mark Shroyer
 
@@ -17,13 +14,58 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License.  You may obtain a copy
 of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations
 under the License.
+
+
+Usage
+-----
+
+The general use case is to wrap functions in the
+:py:class:`~pointfree.pointfree` wrapper / decorator class, granting them
+both automatic partial application support and a pair of function
+composition operators::
+
+    >>> from pointfree import *
+    
+    >>> @pointfree
+    ... def pfadd(a, b):
+    ...     return a + b
+
+    >>> @pointfree
+    ... def pfexp(n, exp):
+    ...     return n ** exp
+    
+    >>> fn = pfexp(exp=2) * pfadd(1)
+    >>> fn(3)
+    16
+
+:py:class:`pointfree.pointfree` inherits from the
+:py:class:`pointfree.partial` class (not to be confused with
+:py:func:`functools.partial`), which provides automatic partial application
+but not the function composition operators.  See :py:class:`partial's
+<pointfree.partial>` documentation for details of the partial application
+semantics, and :py:class:`pointfree's <pointfree.pointfree>` documentation
+for information about the function composition operators.
+
+The module also includes a number of pre-defined helper functions which can
+be combined for various purposes::
+
+    >>> fn = pfmap(lambda x: x**3) >> pfprint_all
+    
+    >>> fn(range(4))
+    0
+    1
+    8
+    27
+
+Refer to the section :ref:`helper_functions` for information about the
+helpers pre-defined in this module.
 
 """
 
@@ -54,28 +96,234 @@ else:
         return inspect.getargspec(f) + ([], None, {})
 
 class partial(object):
-    """Decorator for automatic partial application
+    """Wraps a regular Python function or method into a callable object
+    supporting automatic partial application.
 
-    Converts a regular Python function or method into one supporting
-    automatic partial application.
+    :param func: Function or method to wrap
+    :param pargs: Optional, positional arguments for the wrapped function
+    :param kargs: Optional, keyword arguments for the wrapped function
 
-    >>> @partial
-    ... def foo(a,b,c):
-    ...     return a + b + c
-    >>> foo(1,2,3)
-    6
-    >>> foo(1)(2)(3)
-    6
+    Example::
 
-    Arguments can be grouped in any combination:
+        >>> @partial
+        ... def foo(a,b,c):
+        ...     return a + b + c
+        >>> foo(1,2,3)
+        6
+        >>> foo(1)(2)(3)
+        6
 
-    >>> foo(1,2)(3)
-    6
-    >>> foo(1)(2,3)
-    6
+    Generally speaking, the evaluation strategy with regard to automatic
+    partial application is to apply all given arguments to the underlying
+    function as soon as possible.
 
-    Generally speaking, the evaluation strategy is to apply all supplied
-    arguments to the underlying function as soon as possible.
+    When a :py:class:`~pointfree.partial` instance is called, the
+    positional and keyword arguments supplied are combined with the
+    instance's own cache of arguments for the wrapped function (which is
+    empty to begin with, for instances directly wrapping, or applied as
+    decorators to, pure Python functions or methods).  If the combined set
+    of arguments is sufficient to call the wrapped function, then the
+    function is called and its result returned.  If the combined arguments
+    are *not* sufficient, then a new copy of the wrapper is returned
+    instead, with the new combined argument set in its cache.
+
+    Calling a :py:class:`~pointfree.partial` object never changes its
+    state; instances are immutable for practical purposes, so they can be
+    called and reused indefinitely::
+
+        >>> p = q = foo(1,2)
+        >>> p(3)
+        6
+        >>> q(3) # Using the same instance twice
+        6
+
+    Arguments with default values do not need to be explicitly specified in
+    order for evaluation to occur.  In the following example, ``foo2`` can
+    be evaluated as soon as we have specified the arguments ``a`` and
+    ``b``::
+
+        >>> @partial
+        ... def foo2(a, b, c=3):
+        ...     return a + b + c
+
+        >>> foo2(1,2)
+        6
+        >>> foo2(1)(2)
+        6
+
+    However, if extra arguments are supplied prior to evaluation, and if
+    the underlying function is capable of accepting those arguments, then
+    those will be passed to the function as well.  If we call ``foo2`` as
+    follows, the third argument will be passed to the wrapped function as
+    ``c``, overriding its default value::
+
+        >>> foo2(1,2,5)
+        8
+        >>> foo2(3)(4,5)
+        12
+
+    This works similarly with functions that accept variable positional
+    argument lists::
+
+        >>> @partial
+        ... def foo3(a, *args):
+        ...     return a + sum(args)
+
+        >>> foo3(1)
+        1
+        >>> foo3(1,2)
+        3
+        >>> foo3(1,2,3)
+        6
+
+    Or variable keyword argument lists::
+
+        >>> @partial
+        ... def foo4(a, **kargs):
+        ...     kargs.update({'a': a})
+        ...     return kargs
+
+        >>> result = foo4(3, b=4, c=5)
+        >>> for key in sorted(result.keys()):
+        ...     print("%s: %s" % (key, result[key]))
+        a: 3
+        b: 4
+        c: 5
+
+    But if you attempt to supply an argument that the function cannot
+    accept, a :py:class:`~exceptions.TypeError` will be raised as soon as
+    you attempt to do so -- the wrapper doesn't wait until the underlying
+    function is called before raising the exception (unlike with
+    :py:func:`functools.partial`)::
+
+        >>> @partial
+        ... def foo5(a, b, c):
+        ...     return a + b + c
+
+        >>> foo5(d=7)
+        Traceback (most recent call last):
+            ...
+        TypeError: foo5() got an unexpected keyword argument 'd'
+
+    There are some sutble differences between how automatic partial
+    application works in this module and the semantics of regular Python
+    function application (or, again, of :py:func:`functools.partial`).
+    First, calls to partially applied functions can override (by keyword)
+    an argument specified with a previous call::
+
+        >>> @partial
+        ... def foo6(a, b, c):
+        ...     return (a, b, c)
+
+        >>> foo6(1)(b=2)(b=3)(4) # overriding b given as keyword
+        (1, 3, 4)
+        >>> foo6(1,2)(b=3)(4) # overriding b given positionally
+        (1, 3, 4)
+
+    Also, the wrapper somewhat blurs the line between positional and
+    keyword arguments for the sake of flexibilty.  If an argument is
+    specified with a keyword and then "reached" by a positional argument in
+    a subsequent call, the remaining positional argument specifications
+    "wrap around" the argument previously specified as a keyword.
+
+    This second difference is best illustrated by example.  Again using the
+    function ``foo6`` from above, if we specify ``b`` as a keyword
+    argument::
+
+        >>> p = foo6(b=2)
+
+    and then apply two positional arguments to the resulting
+    :py:class:`~pointfree.partial` instance, those arguments will be used
+    to specify ``a`` and ``c``, skipping over ``b`` because it has already
+    been specified:
+
+        >>> p(1,3)
+        (1, 2, 3)
+
+    This approach was chosen because it allows us to compose partial
+    applications of functions where a previous argument has been specified
+    as a keyword argument.
+
+    As well as functions, :py:class:`~pointfree.partial` can be applied to
+    methods, including class and static methods::
+
+        >>> class Foo7(object):
+        ...     m = 2
+        ...
+        ...     def __init__(self, n):
+        ...         self.n = n
+        ...
+        ...     @partial
+        ...     def bar_inst(self, a, b, c):
+        ...         return self.m + self.n + a + b + c
+        ...
+        ...     @partial
+        ...     @classmethod
+        ...     def bar_class(klass, a, b, c):
+        ...         return klass.m + a + b + c
+        ...
+        ...     @partial
+        ...     @staticmethod
+        ...     def bar_static(a, b, c):
+        ...         return a + b + c
+
+        >>> f = Foo7(3)
+        >>> f.bar_inst(4)(5)(6)
+        20
+        >>> f.bar_class(3)(4)(5)
+        14
+        >>> f.bar_static(2)(3)(4)
+        9
+
+    The wrapper can also be instantiated from another
+    :py:class:`~pointfree.partial` instance::
+
+        >>> p = partial(foo8, 1)
+        >>> q = partial(p, 2)
+        >>> q(3)
+        6
+
+    Or even from a :py:func:`functools.partial` instance:
+
+        >>> p = functools.partial(foo8, 1)
+        >>> q = partial(p)
+        >>> q(2)(3)
+        6
+
+    However, it cannot currently wrap a Python builtin function (or a
+    :py:func:`functools.partial` instance which wraps a builtin function),
+    as Python does not currently provide reflection for its builtins.
+
+    While you will probably apply :py:class:`~pointfree.partial` as a
+    decorator when defining your own functions, you can also wrap existing
+    functions by instantiating the class directly::
+
+        >>> def foo8(a, b, c, *args):
+        ...     return a + b + c + sum(args)
+
+        >>> partial(foo8)(1)(2)(3)
+        6
+
+    Or like with :py:func:`functools.partial`, you can specify arguments
+    for the wrapped function when you instantiate a wrapper:
+
+        >>> p = partial(foo8, 1)
+        >>> p(2)(3)
+        6
+
+    But unlike calling an existing wrapper instance, the wrapped function
+    will not be invoked during instantiation even if enough arguments are
+    supplied.  Invocation does not occur until the
+    :py:class:`~pointfree.partial` instance is called at least once, even
+    with an empty argument list:
+
+        >>> p = partial(foo8, 1, 2, 3)
+        >>> type(p)
+        <class 'pointfree.partial'>
+        >>> p()
+        6
+        >>> p(4)
+        10
 
     """
 
@@ -199,7 +447,9 @@ class partial(object):
             else:
                 num_prev_pargs = len([name for name in self.pargl if name in self.argv])
                 raise TypeError("%s() takes exactly %d positional arguments (%d given)" \
-                                    % (self.__name__, len(self.pargl), num_prev_pargs + len(new_pargs)))
+                                    % (self.__name__,
+                                       len(self.pargl),
+                                       num_prev_pargs + len(new_pargs)))
 
         for k,v in new_kargs.items():
             if not (self.var_kargs or (k in self.pargl) or (k in self.kargl)):

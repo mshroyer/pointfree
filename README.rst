@@ -80,8 +80,8 @@ And you have some text too::
 Now say you want to find just the lines of your text that contain the name
 of a flower and print them, twice, in upper case.  (A common problem, I'm
 sure.)  The given functions can be combined to do so as follows, using
-``pointfree``'s automatic partial application and its
-function composition operators::
+:py:class:`pointfree's <pointfree.pointfree>` automatic partial application
+and its function composition operators::
 
     >>> f = gen_grep(r'(roses|violets|daffodils)') \
     ...     >> gen_upcase \
