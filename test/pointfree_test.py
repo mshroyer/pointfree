@@ -4,7 +4,8 @@ from pointfree import *
 # The unittest.TestCase in Python 2.6 and 3.0 doesn't have some of the
 # methods that we use in our test suite, so...
 if hasattr(unittest.TestCase, 'assertIsInstance') \
-        and hasattr(unittest.TestCase, 'assertDictEqual'):
+        and hasattr(unittest.TestCase, 'assertDictEqual') \
+        and hasattr(unittest.TestCase, 'assertIsNone'):
     from unittest import TestCase
 else:
     class TestCase(unittest.TestCase):
@@ -13,6 +14,9 @@ else:
 
         def assertDictEqual(self, a, b):
             self.assertTrue(a == b)
+
+        def assertIsNone(self, x):
+            self.assertTrue(x is None)
 
 ### PARTIAL APPLICATION FIXTURES ##########################################
 
