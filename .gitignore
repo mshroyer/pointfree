@@ -3,4 +3,5 @@ dist/
 *.pyc
 pointfree.egg-info
 MANIFEST
-TODO.org
+doc/_build/*
+!.empty
