@@ -80,7 +80,7 @@ And you have some text too::
 Now say you want to find just the lines of your text that contain the name
 of a flower and print them, twice, in upper case.  (A common problem, I'm
 sure.)  The given functions can be combined to do so as follows, using
-:py:class:`pointfree's <pointfree.pointfree>` automatic partial application
+pointfree's automatic partial application
 and its function composition operators::
 
     >>> f = gen_grep(r'(roses|violets|daffodils)') \
@@ -142,7 +142,8 @@ module reference for details.
 Getting the module
 ------------------
 
-For the latest version of ``pointfree``, visit its Github page:
+For the current development version of ``pointfree``, visit its
+Github page:
 
 https://github.com/markshroyer/pointfree
 
@@ -152,7 +153,8 @@ http://pointfree.rtfd.org/
 
 .. _`Read the Docs`: http://www.readthedocs.org/
 
-``pointfree`` works on the following Python implementations:
+``pointfree`` is compatible with the following Python
+implementations:
 
 * CPython 2.6, 2.7, 3.0, 3.1, and 3.2
 
@@ -160,6 +162,6 @@ http://pointfree.rtfd.org/
 
 * IronPython 2.7.1
 
-`PEP 3102`_ keyword-only arguments are fully supported on Python 3.
+Python 3 is fully supported, including `PEP 3102`_ keyword-only arguments.
 
 .. _`PEP 3102`: http://www.python.org/dev/peps/pep-3102/

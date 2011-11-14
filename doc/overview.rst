@@ -148,7 +148,8 @@ differences from normal Python function application rules.  Please see the
 Getting the module
 ------------------
 
-For the latest version of :py:mod:`pointfree`, visit its Github page:
+For the current development version of :py:mod:`pointfree`, visit its
+Github page:
 
 https://github.com/markshroyer/pointfree
 
@@ -158,7 +159,8 @@ http://pointfree.rtfd.org/
 
 .. _`Read the Docs`: http://www.readthedocs.org/
 
-:py:mod:`pointfree` works on the following Python implementations:
+:py:mod:`pointfree` is compatible with the following Python
+implementations:
 
 * CPython 2.6, 2.7, 3.0, 3.1, and 3.2
 
@@ -166,6 +168,6 @@ http://pointfree.rtfd.org/
 
 * IronPython 2.7.1
 
-`PEP 3102`_ keyword-only arguments are fully supported on Python 3.
+Python 3 is fully supported, including `PEP 3102`_ keyword-only arguments.
 
 .. _`PEP 3102`: http://www.python.org/dev/peps/pep-3102/
