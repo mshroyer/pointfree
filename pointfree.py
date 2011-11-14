@@ -592,9 +592,9 @@ def pfmap(func, iterable):
 
 @pointfree
 def pfreduce(func, iterable, initial=None):
-    """A pointfree reduce function: Applies a function of two arguments
-    cumulatively to the items supplied by the given iterable, so as to
-    reduce the iterable to a single value.  If an initial value is
+    """A pointfree reduce / left fold function: Applies a function of two
+    arguments cumulatively to the items supplied by the given iterable, so
+    as to reduce the iterable to a single value.  If an initial value is
     supplied, it is placed before the items from the iterable in the
     calculation, and serves as the default when the iterable is empty.
 
