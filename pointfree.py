@@ -1,5 +1,5 @@
 """
-:py:mod:`pointfree` -- Pythonic pointfree programming.
+Pythonic pointfree programming.
 
 * Full documentation: http://pointfree.rtfd.org/
 * Project page: https://github.com/markshroyer/pointfree
@@ -65,7 +65,7 @@ be combined for various purposes::
     27
 
 Refer to the section :ref:`helper_functions` for information about the
-helpers pre-defined in this module.
+helpers provided by this module.
 
 """
 
@@ -192,8 +192,8 @@ class partial(object):
         c: 5
 
     But if you attempt to supply an argument that the function cannot
-    accept, a :py:class:`~exceptions.TypeError` will be raised as soon as
-    you attempt to do so -- the wrapper doesn't wait until the underlying
+    accept, a :py:exc:`~exceptions.TypeError` will be raised as soon as you
+    attempt to do so -- the wrapper doesn't wait until the underlying
     function is called before raising the exception (unlike with
     :py:func:`functools.partial`)::
 
