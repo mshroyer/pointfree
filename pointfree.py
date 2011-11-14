@@ -334,14 +334,9 @@ class partial(object):
         self.extra_argv = []
         self.__call_error = None
 
-        # Set __doc__ and __name__ prior to applying function arguments so
-        # that we can report the error properly if an exception is raised
-        # there...
-        self.__doc__  = func.__doc__  if hasattr(func, '__doc__')  else ''
-        self.__name__ = func.__name__ if hasattr(func, '__name__') else '<unnamed>'
-
         if isinstance(func, partial):
             self.func = func.func
+            functools.update_wrapper(self, self.func)
             inst = func
             self.argv = inst.argv
             self.extra_argv = inst.extra_argv
@@ -349,6 +344,7 @@ class partial(object):
 
         elif isinstance(func, functools.partial):
             self.func = func.func
+            functools.update_wrapper(self, self.func)
             self.__sig_from_func(self.func)
             partial_args = func.args or ()
             partial_keywords = func.keywords or {}
@@ -358,6 +354,7 @@ class partial(object):
             self.__call_error = "'%s' object is not callable" % type(func).__name__
 
         else:
+            functools.update_wrapper(self, func)
             self.__sig_from_func(func)
 
         self.__update_argv(*pargs, **kargs)
@@ -418,9 +415,9 @@ class partial(object):
 
         """
 
-        dest               = klass(func or inst.func)
-        dest.argv          = (argv or inst.argv).copy()
-        dest.extra_argv    = list(extra_argv if extra_argv else inst.extra_argv)
+        dest            = klass(func or inst.func)
+        dest.argv       = (argv or inst.argv).copy()
+        dest.extra_argv = list(extra_argv if extra_argv else inst.extra_argv)
 
         if copy_sig:
             dest.__sig_from_partial(inst)
