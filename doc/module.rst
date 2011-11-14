@@ -25,6 +25,8 @@ Composable helper functions
 
 .. autofunction:: pfcollect(iterable[, n=None])
 
-.. autofunction:: pfprint_all(iterable)
+.. autofunction:: pfprint(item[, end='\\n', file=sys.stdout])
+
+.. autofunction:: pfprint_all(iterable[, end='\\n', file=sys.stdout])
 
 .. autofunction:: pfignore_all(iterable)

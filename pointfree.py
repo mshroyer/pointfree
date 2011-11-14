@@ -82,6 +82,7 @@ __all__ = [
     'pfmap',
     'pfreduce',
     'pfcollect',
+    'pfprint',
     'pfprint_all',
     'pfignore_all',
     ]
@@ -648,10 +649,39 @@ def pfcollect(iterable, n=None):
         return list(iterable)
 
 @pointfree
-def pfprint_all(iterable):
+def pfprint(item, end='\n', file=None):
+    """Prints an item.
+
+    :param item: The item to print
+    :param end: String to append to the end of printed output
+    :param file: File to which output is printed
+    :rtype: None
+
+    Example::
+
+        >>> from operator import add
+        
+        >>> fn = pfreduce(add, initial=0) >> pfprint
+        >>> fn([1, 2, 3, 4])
+        10
+
+    """
+
+    # Can't just make sys.stdout the file argument's default value, because
+    # then we would be capturing the stdout file descriptor, and doctest --
+    # which works by redefining sys.stdout -- would fail:
+    if file is None:
+        file = sys.stdout
+
+    print(item, end=end, file=file)
+
+@pointfree
+def pfprint_all(iterable, end='\n', file=None):
     """Prints each item from an iterable.
 
     :param iterable: An iterable yielding values to print
+    :param end: String to append to the end of printed output
+    :param file: File to which output is printed
     :rtype: None
 
     Example::
@@ -670,8 +700,11 @@ def pfprint_all(iterable):
 
     """
 
+    if file is None:
+        file = sys.stdout
+
     for item in iterable:
-        print(item)
+        pfprint(item, end=end, file=file)
 
 @pointfree
 def pfignore_all(iterator):
