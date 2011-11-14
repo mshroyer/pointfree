@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+# Runs all the unit tests and doctests for pointfree in one go.
+#
+# Note that the unit tests in test/pointfree_test.py are intended as the
+# canonical indication of whether pointfree works on a given platform; the
+# doctests fail in IronPython and CPython 3.0 for unimportant reasons, but
+# the unittests pass on those platforms.
+#
+# Mark Shroyer
+# Mon Nov 14 00:19:27 EST 2011
+
 from __future__ import print_function
 
 DOCTEST_FILENAMES = set(["overview.rst", "module.rst", "faq.rst"])
