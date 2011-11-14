@@ -153,13 +153,17 @@ from PyPI_ using pip_::
 
     $ pip install pointfree
 
+or easy_install::
+
+    $ easy_install pointfree
+
 .. _PyPI: https://pypi.python.org/
 
 .. _pip: http://pypi.python.org/pypi/pip
 
 Or you can `download the module manually
 <https://pypi.python.org/pypi/pointfree/>`_ and perform the standard
-incantations::
+distutils incantations::
 
     $ tar xzf pointfree-*.tar.gz
     $ cd pointfree-*
@@ -169,7 +173,7 @@ The module's development repository is hosted on Github:
 
 https://github.com/markshroyer/pointfree
 
-The latest development version can also be installed using pip::
+and the very latest development version can also be installed using pip::
 
     $ pip install git+git://github.com/markshroyer/pointfree.git
 
