@@ -22,7 +22,7 @@ def section_delimiter(line):
 
 sub1_pat = re.compile(r':(?:[\w\d]+:)+`~(?:[\w\d]+\.)+([\w\d]+)`')
 sub2_pat = re.compile(r':(?:[\w\d]+:)+`([\w\d\.]+)`')
-sub3_pat = re.compile(r':ref:`(.+) \<.+\>`')
+sub3_pat = re.compile(r':(?:[\w\d]+:)+`(.+) \<.+\>`')
 
 class RstSection(object):
     def __init__(self, name=None):
