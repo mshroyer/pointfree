@@ -8,18 +8,21 @@ FAQ
   implementation of partial function application for this module.
 
   First, use of the function composition operators provided by the
-  ``pointfree`` decorator requires cooperation between the partial
-  application mechanism and the implementation of overloaded operators; the
-  result of a partial application must be an object which defines the
-  necessary operators, so at the very least I would need to wrap
-  :py:func:`functools.partial` anyway.
+  :py:class:`~pointfree.pointfree` decorator requires cooperation between
+  the partial application mechanism and the implementation of overloaded
+  operators; the result of a partial application must be an object which
+  defines the necessary operators, so at the very least I would need to
+  wrap :py:func:`functools.partial` anyway.  (And that in itself would not
+  be easy, because :py:func:`functools.partial` does not provide a way to
+  test whether enough arguments have been provided to call the underlying
+  function.)
 
-  The second reason is a matter of subjective taste.  The standard
-  library's ``partial`` class requires explicit creation of a new object
-  every time you wish to perform partial application and then a separate
-  call in order to actually invoke the underlying function, and this is
-  more verbose and (in my opinion) less elegant than I would like.  For a
-  contrived example::
+  The second reason is a subjective matter of taste.  The standard
+  library's :py:func:`~functools.partial` requires explicit creation of a
+  new object every time you wish to perform partial application and then a
+  separate call in order to actually invoke the underlying function, and
+  this is more verbose and (in my opinion) less elegant than I would like.
+  For a contrived example::
 
       >>> from functools import partial
               
@@ -33,8 +36,9 @@ FAQ
       >>> plusthree(3)
       6
 
-  In contrast, pointfree's ``partial`` decorator lets you perform partial
-  application with the same syntax as "full" application::
+  In contrast, pointfree's :py:class:`~pointfree.partial` decorator lets
+  you perform partial application with the same syntax as "full"
+  application::
 
       >>> from pointfree import partial
       
@@ -49,12 +53,12 @@ FAQ
       >>> plusthree(3)
       6
 
-  There are also several minor ways in which the functools ``partial``
-  object is not ideal for supporting the pointfree style.  If you have a
-  function of two arguments and you specify the first as a keyword
-  argument, you cannot then specify the second positionally in a subsequent
-  application; this would prevent such a partially-applied function from
-  being composed with other functions::
+  There are also several minor ways in which :py:func:`functools.partial`
+  is not ideal for supporting the pointfree style.  If you have a function
+  of two arguments and you specify the first as a keyword argument, you
+  cannot then specify the second positionally in a subsequent application;
+  this would prevent such a partially-applied function from being composed
+  with other functions::
 
       >>> from functools import partial
       
@@ -69,7 +73,7 @@ FAQ
 
   Whereas you can do this with pointfree, due to its slightly different
   semantics for positional argument application (which is fully described
-  in the decorator's API reference)::
+  in the :ref:`module_reference`)::
 
       >>> from pointfree import partial
       
@@ -83,7 +87,7 @@ FAQ
 
   Also, with the standard library's partial class you don't see errors
   immediately when you apply invalid positional or keyword arguments; the
-  exception is only raised when you then ``__call__`` the partial object::
+  exception is only raised when you later ``__call__`` the partial object::
 
       >>> from functools import partial
       
@@ -111,17 +115,17 @@ FAQ
           ...
       TypeError: add() got an unexpected keyword argument 'c'
 
-* **Q. OK, so what are the disadvantages of pointfree's partial
-  decorator?**
+* **Q. Are there any disadvantages to pointfree's partial application
+  style?**
 
   Because Python does not currently expose built-in functions for
-  introspection, the pure-Python :py:func:`pointfree.partial` method does
+  introspection, the pure-Python :py:class:`pointfree.partial` wrapper does
   not work with built-in functions.
 
-  Also, with the pointfree implementation you cannot specify optional
-  positional arguments in *multiple* applications, because evaluation will
-  occur automatically as soon as enough arguments have been specified.  So,
-  for instance, with functools ``partial``::
+  Also, with the pointfree implementation of partial application you cannot
+  specify optional positional arguments in *multiple* applications, because
+  evaluation will occur automatically as soon as enough arguments have been
+  specified.  So, for instance, with :py:func:`functools.partial`::
 
       >>> from functools import partial
       
@@ -138,7 +142,7 @@ FAQ
 
       >>> from pointfree import partial
       
-      >>> partial(add_all)(1, 2)
+      >>> partial(add_all)(1, 2) # evaluated immediately
       3
 
   Despite these limitations, I prefer the brevity of the pointfree
