@@ -148,16 +148,36 @@ differences from normal Python function application rules.  Please see the
 Getting the module
 ------------------
 
-For the current development version of :py:mod:`pointfree`, visit its
-Github page:
-
-https://github.com/markshroyer/pointfree
-
 Documentation is hosted on `Read the Docs`_:
 
 http://pointfree.rtfd.org/
 
 .. _`Read the Docs`: http://www.readthedocs.org/
+
+The easiest way to install the latest release on your machine is to get it
+from PyPI_ using pip_::
+
+    $ pip install pointfree
+
+.. _PyPI: https://pypi.python.org/
+
+.. _pip: http://pypi.python.org/pypi/pip
+
+Or you can `download the module manually
+<https://pypi.python.org/pypi/pointfree/>`_ and perform the standard
+incantations::
+
+    $ tar xzf pointfree-*.tar.gz
+    $ cd pointfree-*
+    $ python setup.py install
+
+The module's development repository is hosted on Github:
+
+https://github.com/markshroyer/pointfree
+
+The latest development version can also be installed using pip::
+
+    $ pip install git+git://github.com/markshroyer/pointfree.git
 
 :py:mod:`pointfree` is compatible with the following Python
 implementations:
