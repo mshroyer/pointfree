@@ -121,9 +121,9 @@ class partial(object):
     When a :py:class:`~pointfree.partial` instance is called, the
     positional and keyword arguments supplied are combined with the
     instance's own cache of arguments for the wrapped function (which is
-    empty to begin with, for instances directly wrapping, or applied as
-    decorators to, pure Python functions or methods).  If the combined set
-    of arguments is sufficient to call the wrapped function, then the
+    empty to begin with, for instances directly wrapping -- or applied as
+    decorators to -- pure Python functions or methods).  If the combined
+    set of arguments is sufficient to invoke the wrapped function, then the
     function is called and its result returned.  If the combined arguments
     are *not* sufficient, then a new copy of the wrapper is returned
     instead, with the new combined argument set in its cache.
@@ -135,8 +135,8 @@ class partial(object):
         >>> p = q = foo(1,2)
         >>> p(3)
         6
-        >>> q(3) # Using the same instance twice
-        6
+        >>> q(4) # Using the same instance twice
+        7
 
     Arguments with default values do not need to be explicitly specified in
     order for evaluation to occur.  In the following example, ``foo2`` can
@@ -191,10 +191,10 @@ class partial(object):
         b: 4
         c: 5
 
-    But if you attempt to supply an argument that the function cannot
-    accept, a :py:exc:`~exceptions.TypeError` will be raised as soon as you
-    attempt to do so -- the wrapper doesn't wait until the underlying
-    function is called before raising the exception (unlike with
+    But if you try to supply an argument that the function cannot accept, a
+    :py:exc:`~exceptions.TypeError` will be raised as soon as you attempt
+    to do so -- the wrapper doesn't wait until the underlying function is
+    called before raising the exception (unlike with
     :py:func:`functools.partial`)::
 
         >>> @partial
@@ -209,8 +209,8 @@ class partial(object):
     There are some sutble differences between how automatic partial
     application works in this module and the semantics of regular Python
     function application (or, again, of :py:func:`functools.partial`).
-    First, calls to partially applied functions can override (by keyword)
-    an argument specified with a previous call::
+    First, keyword arguments to partially applied functions can override an
+    argument specified in a previous call::
 
         >>> @partial
         ... def foo6(a, b, c):
@@ -224,8 +224,8 @@ class partial(object):
     Also, the wrapper somewhat blurs the line between positional and
     keyword arguments for the sake of flexibilty.  If an argument is
     specified with a keyword and then "reached" by a positional argument in
-    a subsequent call, the remaining positional argument specifications
-    "wrap around" the argument previously specified as a keyword.
+    a subsequent call, the remaining positional argument values "wrap
+    around" the argument previously specified as a keyword.
 
     This second difference is best illustrated by example.  Again using the
     function ``foo6`` from above, if we specify ``b`` as a keyword
@@ -296,7 +296,8 @@ class partial(object):
 
     However, it cannot currently wrap a Python builtin function (or a
     :py:func:`functools.partial` instance which wraps a builtin function),
-    as Python does not currently provide reflection for its builtins.
+    as Python does not currently provide sufficient reflection for its
+    builtins.
 
     While you will probably apply :py:class:`~pointfree.partial` as a
     decorator when defining your own functions, you can also wrap existing
@@ -314,7 +315,7 @@ class partial(object):
 
     But unlike calling an existing wrapper instance, the wrapped function
     will not be invoked during instantiation even if enough arguments are
-    supplied.  Invocation does not occur until the
+    supplied in order to do so; invocation does not occur until the
     :py:class:`~pointfree.partial` instance is called at least once, even
     with an empty argument list:
 
@@ -491,20 +492,21 @@ class partial(object):
 class pointfree(partial):
     """Wraps a regular Python function or method into a callable object
     supporting the ``>>`` and ``*`` function composition operators, as well
-    as automatic partial application.
+    as automatic partial application inherited from
+    :py:class:`~pointfree.partial`.
 
     :param func: Function or method to wrap
     :param pargs: Optional, positional arguments for the wrapped function
     :param kargs: Optional, keyword arguments for the wrapped function
 
     This class inherits its partial application behavior from
-    :py:class:`~pointfree.partial`; refer to its documentation on partial
-    application behavior.
+    :py:class:`~pointfree.partial`; refer to its documentation for details.
 
-    On top of partial application, the :py:class:`~pointfree.pointfree`
-    wrapper adds two function composition operators, ``>>`` and ``*``, for
-    "forward" and "reverse" function composition respectively.  For
-    example, given the following wrapped functions::
+    On top of automatic partial application, the
+    :py:class:`~pointfree.pointfree` wrapper adds two function composition
+    operators, ``>>`` and ``*``, for "forward" and "reverse" function
+    composition respectively.  For example, given the following wrapped
+    functions::
 
         >>> @pointfree
         ... def pfadd(a, b):
@@ -542,6 +544,11 @@ class pointfree(partial):
         >>> f = pf(add, 1) >> pf(mul, 2)
         >>> f(2)
         6
+
+    When using :py:class:`~pointfree.pointfree` as a decorator on class or
+    static methods, you must ensure that it is the "topmost" decorator, so
+    that the resulting object is a :py:class:`~pointfree.pointfree`
+    instance in order for the composition operators to work.
 
     """
 

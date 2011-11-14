@@ -96,10 +96,10 @@ and its function composition operators::
     OH YEAH AND DAFFODILS ARE FLOWERS TOO
     OH YEAH AND DAFFODILS ARE FLOWERS TOO
 
-In addition to the ``>>`` operator for "forward" composition, functions can
-also be composed with the ``*`` operator.  (This is intended to be
-remniscent of the circle operator "∘" from algebra, or the corresponding
-dot operator in Haskell.)::
+In addition to the ``>>`` operator for "forward" composition (borrowed from
+F#), functions can also be composed with the ``*`` operator, which is
+intended to be remniscent of the circle operator "∘" from algebra, or the
+corresponding dot operator in Haskell::
 
     >>> @pointfree
     ... def f(x):
