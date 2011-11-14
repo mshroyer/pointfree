@@ -148,11 +148,9 @@ differences from normal Python function application rules.  Please see the
 Getting the module
 ------------------
 
-Documentation is hosted on `Read the Docs`_:
+Full documentation is available on the web at:
 
-http://pointfree.rtfd.org/
-
-.. _`Read the Docs`: http://www.readthedocs.org/
+http://markshroyer.com/docs/pointfree/latest/
 
 The easiest way to install the latest release on your machine is to get it
 from PyPI_ using pip_::
