@@ -602,7 +602,7 @@ def pfreduce(func, iterable, initial=None):
 
     """
 
-    iterator = iterable.__iter__()
+    iterator = iter(iterable)
     try:
         first_item = next(iterator)
         if initial:
