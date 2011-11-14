@@ -361,13 +361,12 @@ class partial(object):
         self.__update_argv(*pargs, **kargs)
 
     def __sig_from_func(self, func):
-        # Extract function signature, default arguments, keyword-only
-        # arguments, and whether or not variable positional or keyword
-        # arguments are allowed.  This also supports calling unbound
-        # instance methods by passing an object instance as the first
-        # argument; however, unbound classmethod and staticmethod
-        # objects are not callable, so we do not attempt to support
-        # them here.
+        """Extract function signature, default arguments, keyword-only
+        arguments, and whether or not variable positional or keyword
+        arguments are allowed.  This also supports calling unbound instance
+        methods by passing an object instance as the first argument;
+        however, unbound classmethod and staticmethod objects are not
+        callable, so we do not attempt to support them here."""
 
         if isinstance(func, types.MethodType):
             # A bound instance or class method.
@@ -395,6 +394,8 @@ class partial(object):
             self.def_argv.update(argspec[5])
 
     def __sig_from_partial(self, inst):
+        """Extract function signature from an existing partial instance."""
+
         self.pargl     = list(inst.pargl)
         self.kargl     = list(inst.kargl)
         self.def_argv  = inst.def_argv.copy()
@@ -429,6 +430,9 @@ class partial(object):
         return self.make_copy(self, func=self.func.__get__(inst, owner), copy_sig=False)
 
     def __new_argv(self, *new_pargs, **new_kargs):
+        """Calculate new argv and extra_argv values resulting from adding
+        the specified positional and keyword arguments."""
+
         new_argv = self.argv.copy()
         new_extra_argv = list(self.extra_argv)
 
@@ -672,8 +676,8 @@ def pfprint(item, end='\n', file=None):
     """
 
     # Can't just make sys.stdout the file argument's default value, because
-    # then we would be capturing the stdout file descriptor, and doctest --
-    # which works by redefining sys.stdout -- would fail:
+    # then we would be capturing the stdout file descriptor, and then
+    # doctest -- which works by redefining sys.stdout -- would fail:
     if file is None:
         file = sys.stdout
 
@@ -703,9 +707,6 @@ def pfprint_all(iterable, end='\n', file=None):
         An item: baz
 
     """
-
-    if file is None:
-        file = sys.stdout
 
     for item in iterable:
         pfprint(item, end=end, file=file)
