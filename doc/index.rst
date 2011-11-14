@@ -11,9 +11,8 @@ Pointfree documentation
 :Release: |version|
 :Date: |today|
 
-:py:mod:`pointfree` is a module providing Pythonic pointfree programming.
-This documentation serves as both a general introduction to the the module
-and the canonical reference on its contents.
+:py:mod:`pointfree` is a module providing Pythonic pointfree-style
+programming.  This is its documentation.
 
 .. toctree::
    :maxdepth: 2

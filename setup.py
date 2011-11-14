@@ -4,11 +4,11 @@ from distutils.core import setup
 
 setup(
     name='pointfree',
-    version='0.1',
+    version='1.0.0',
     description='Pointfree style toolkit for Python',
     author='Mark Shroyer',
     author_email='code@markshroyer.com',
-    url='https://github.com/markshroyer/python-pointfree',
+    url='https://github.com/markshroyer/pointfree',
     py_modules=['pointfree'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
