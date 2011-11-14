@@ -6,6 +6,11 @@
 Pointfree documentation
 =======================
 
+:Author: Mark Shroyer
+:Email: code@markshroyer.com
+:Release: |version|
+:Date: |today|
+
 :py:mod:`pointfree` is Pythonic pointfree programming.  This is its
 documentation.
 
@@ -16,6 +21,7 @@ documentation.
    module
    faq
    license
+
 
 Indices and tables
 ==================
