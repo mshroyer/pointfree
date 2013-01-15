@@ -178,9 +178,9 @@ and the very latest development version can also be installed using pip::
 ``pointfree`` is compatible with the following Python
 implementations:
 
-* CPython 2.6, 2.7, 3.0, 3.1, and 3.2
+* CPython 2.6, 2.7, 3.0, 3.1, 3.2, and 3.3
 
-* PyPy 1.6.0
+* PyPy 1.9.0
 
 * IronPython 2.7.1
 

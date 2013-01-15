@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='pointfree',
-    version='1.0.0',
+    version='1.0.1',
     description='Pointfree style toolkit for Python',
     long_description="""
 pointfree is a small module that makes certain functional programming
@@ -46,6 +46,7 @@ http://markshroyer.com/docs/pointfree/latest/
         'Programming Language :: Python :: 3.0',
         'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Operating System :: OS Independent',
         'Topic :: Software Development',
         ]
