@@ -66,7 +66,7 @@ FAQ
       ...     return a + b
       
       >>> p = partial(add, a=1)
-      >>> p(2)
+      >>> p(2)                         # doctest: +IGNORE_EXCEPTION_DETAIL
       Traceback (most recent call last):
           ...
       TypeError: add() got multiple values for keyword argument 'a'
