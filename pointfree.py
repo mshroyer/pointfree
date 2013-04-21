@@ -81,6 +81,7 @@ __all__ = [
     'pf',
     'pfmap',
     'pfreduce',
+    'pffilter',
     'pfcollect',
     'pfprint',
     'pfprint_all',
@@ -626,6 +627,23 @@ def pfreduce(func, iterable, initial=None):
     for item in iterator:
         value = func(value, item)
     return value
+
+@pointfree
+def pffilter(pred, iterable):
+    """Pointfree filter function.
+
+    Example::
+
+        >>> f = pffilter(lambda n: n % 2 == 0) \\
+        ...     >> pfcollect
+
+        >>> f(range(5))
+        [0, 2, 4]
+
+    """
+
+    for item in iterable:
+        if pred(item): yield item
 
 @pointfree
 def pfcollect(iterable, n=None):
