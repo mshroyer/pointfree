@@ -32,7 +32,7 @@ both automatic partial application support and a pair of function
 composition operators::
 
     >>> from pointfree import *
-    
+
     >>> @pointfree
     ... def pfadd(a, b):
     ...     return a + b
@@ -40,7 +40,7 @@ composition operators::
     >>> @pointfree
     ... def pfexp(n, exp):
     ...     return n ** exp
-    
+
     >>> fn = pfexp(exp=2) * pfadd(1)
     >>> fn(3)
     16
@@ -57,7 +57,7 @@ The module also includes a number of pre-defined helper functions which can
 be combined for various purposes::
 
     >>> fn = pfmap(lambda x: x**3) >> pfprint_all
-    
+
     >>> fn(range(4))
     0
     1
@@ -81,6 +81,7 @@ __all__ = [
     'pf',
     'pfmap',
     'pfreduce',
+    'pffilter',
     'pfcollect',
     'pfprint',
     'pfprint_all',
@@ -581,7 +582,7 @@ def pfmap(func, iterable):
         >>> f = pfmap(lambda x: x+1) \\
         ...     >> pfmap(lambda x: x*2) \\
         ...     >> pfcollect
-        
+
         >>> f(range(5))
         [2, 4, 6, 8, 10]
 
@@ -606,7 +607,7 @@ def pfreduce(func, iterable, initial=None):
     Example::
 
         >>> from operator import add
-        
+
         >>> sum_of_squares = pfreduce(add, initial=0) * pfmap(lambda n: n**2)
         >>> sum_of_squares([3, 4, 5, 6])
         86
@@ -626,6 +627,23 @@ def pfreduce(func, iterable, initial=None):
     for item in iterator:
         value = func(value, item)
     return value
+
+@pointfree
+def pffilter(pred, iterable):
+    """Pointfree filter function.
+
+    Example::
+
+        >>> f = pffilter(lambda n: n % 2 == 0) \\
+        ...     >> pfcollect
+
+        >>> f(range(5))
+        [0, 2, 4]
+
+    """
+
+    for item in iterable:
+        if pred(item): yield item
 
 @pointfree
 def pfcollect(iterable, n=None):
@@ -668,7 +686,7 @@ def pfprint(item, end='\n', file=None):
     Example::
 
         >>> from operator import add
-        
+
         >>> fn = pfreduce(add, initial=0) >> pfprint
         >>> fn([1, 2, 3, 4])
         10
