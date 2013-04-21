@@ -144,7 +144,7 @@ Getting the module
 
 Full documentation is available on the web at:
 
-http://markshroyer.com/docs/pointfree/latest/
+http://pointfree.readthedocs.org/en/latest/
 
 The easiest way to install the latest release on your machine is to get it
 from PyPI_ using pip_::
