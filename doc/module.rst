@@ -23,6 +23,8 @@ Composable helper functions
 
 .. autofunction:: pfreduce(func, iterable[, initial=None])
 
+.. autofunction:: pffilter(param, iterable)
+
 .. autofunction:: pfcollect(iterable[, n=None])
 
 .. autofunction:: pfprint(item[, end='\\n', file=sys.stdout])
