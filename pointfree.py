@@ -1,7 +1,7 @@
 """
 Pythonic pointfree programming.
 
-* Full documentation: http://markshroyer.com/docs/pointfree/latest/
+* Full documentation: http://pointfree.readthedocs.org/en/latest/
 * Project page: https://github.com/markshroyer/pointfree
 
 
