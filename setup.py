@@ -28,7 +28,7 @@ PyCon 2008 presentation, `"Generator Tricks for Systems Programmers"`_.
 
 Full documentation is available on the web at:
 
-http://markshroyer.com/docs/pointfree/latest/
+http://pointfree.readthedocs.org/en/latest/
 """,
     author='Mark Shroyer',
     author_email='code@markshroyer.com',
