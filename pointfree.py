@@ -73,7 +73,7 @@ from __future__ import print_function
 
 __author__  = "Mark Shroyer"
 __email__   = "code@markshroyer.com"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     'partial',
